@@ -1,26 +1,32 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
 const ReserveSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.objectId, ref: "User", required: true },
+  user: {
+    type: mongoose.Schema.objectId,
+    ref: 'User',
+    required: [true, 'Please add a user'],
+  },
   campground: {
     type: mongoose.Schema.objectId,
-    ref: "Campground",
-    required: true,
+    ref: 'Campground',
+    required: [true, 'Please add a campground'],
   },
   site: {
-    number: { type: Number, require: true },
-    zone: { type: String },
+    number: { type: Number, require: [true, 'Please add a site number'] },
+    zone: String,
     size: {
       width: { type: Number, require: true },
       length: { type: Number, require: true },
     },
   },
-  start_date: { type: Date, require: true },
-  end_date: { type: Date, require: true },
-  tent_size: {
-    width: { type: Number, require: true },
-    length: { type: Number, require: true },
+  startDate: { type: Date, require: [true, 'Please add a start date'] },
+  endDate: { type: Date, require: [true, 'Please add an end date'] },
+  tentSize: {
+    width: { type: Number, require: [true, 'Please add a tent width'] },
+    length: { type: Number, require: [true, 'Please add a tent length'] },
   },
-  amount: { type: Number, require: true },
+  amount: Number,
   reservedAt: { type: DataTransfer, default: Date.now },
-});
+})
+
+module.exports = mongoose.model('Reserve', ReserveSchema)
