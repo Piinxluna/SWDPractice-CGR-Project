@@ -19,6 +19,10 @@ app.get('/', (req, res) => {
   res.status(200).json({ success: true })
 })
 
+// Routing
+const tests = require('./routes/test')
+app.use('/test', tests)
+
 // setting up port
 const PORT = process.env.PORT || 5000
 const server = app.listen(
