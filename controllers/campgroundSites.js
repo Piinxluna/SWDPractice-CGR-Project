@@ -71,25 +71,25 @@ exports.createCampgroundSite = async (req, res, next) => {
 exports.getCampgroundSite = async (req, res, next) => {
   try {
     // Find a campground
-    const campground = await Campground.findById(req.params.cgid)
+    let campground = await Campground.findById(req.params.cgid)
     if (!campground) {
       return res
         .status(400)
         .json({ success: false, message: 'Cannot find this campground' })
     }
 
-    // Find a site in a campground
-    let campgroundSite = campground.sites.find(
+    // Find a site in a campground & Delete unmatch sites
+    campground.sites = campground.sites.filter(
       (element) => element.id === req.params.sid
     )
-    if (!campgroundSite) {
+    if (campground.sites.length === 0) {
       return res
         .status(400)
         .json({ success: false, message: 'Cannot find this site' })
     }
 
     // Send response
-    res.status(200).json({ sucess: true, data: campgroundSite })
+    res.status(200).json({ sucess: true, data: campground })
   } catch (err) {
     res.status(400).json({ success: false })
   }
