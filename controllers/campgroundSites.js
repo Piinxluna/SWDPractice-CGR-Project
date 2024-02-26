@@ -47,19 +47,50 @@ exports.createCampgroundSite = async (req, res, next) => {
     }
 
     // Add new site to a campground
-    const campgroundSite = await Campground.findByIdAndUpdate(
+    const updatedCampground = await Campground.findByIdAndUpdate(
       req.params.cgid,
       { $push: { sites: req.body } },
       { runValidators: true }
     )
-    if (!campgroundSite) {
+    if (!updatedCampground) {
       return res
         .status(400)
         .json({ sucess: false, message: 'Cannot add the new site' })
     }
 
-    res.status(201).json({ sucess: true, data: campgroundSite })
+    // Send response
+    res.status(201).json({ sucess: true, data: updatedCampground })
   } catch (err) {
     res.status(400).json({ sucess: false })
+  }
+}
+
+// @desc    Get a campground site in specific campground
+// @route   /api/campgrounds/:cgid/sites/:sid
+// @access  Public
+exports.getCampgroundSite = async (req, res, next) => {
+  try {
+    // Find a campground
+    const campground = await Campground.findById(req.params.cgid)
+    if (!campground) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Cannot find this campground' })
+    }
+
+    // Find a site in a campground
+    let campgroundSite = campground.sites.find(
+      (element) => element.id === req.params.sid
+    )
+    if (!campgroundSite) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Cannot find this site' })
+    }
+
+    // Send response
+    res.status(200).json({ sucess: true, data: campgroundSite })
+  } catch (err) {
+    res.status(400).json({ success: false })
   }
 }
