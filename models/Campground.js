@@ -38,7 +38,7 @@ const CampgroundSchema = new mongoose.Schema({
     link: String,
   },
   website: String,
-  picture: [String],
+  pictures: [String],
   facilities: [String],
   tentForRent: {
     type: Boolean,
@@ -54,7 +54,6 @@ const CampgroundSchema = new mongoose.Schema({
       zone: String,
       number: {
         type: Number,
-        unique: true,
         required: [true, 'Please add a unique site number'],
       },
       size: {
