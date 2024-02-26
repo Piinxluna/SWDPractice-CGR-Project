@@ -19,9 +19,22 @@ app.get('/', (req, res) => {
   res.status(200).json({ success: true })
 })
 
-// Routing
+// Routing Tester
+app.get('/', (req, res) => {
+  res.status(200).json({ success: true })
+})
 const tests = require('./routes/test')
 app.use('/test', tests)
+
+// Routing
+const campgrounds = require('./routes/campgrounds')
+app.use('/api/campgrounds', campgrounds)
+// const campgrounds = require('./routes/campgrounds')
+// app.use('/api/auth')
+// const campgrounds = require('./routes/campgrounds')
+// app.use('/api/user')
+// const campgrounds = require('./routes/campgrounds')
+// app.use('/api/reserves')
 
 // setting up port
 const PORT = process.env.PORT || 5000
