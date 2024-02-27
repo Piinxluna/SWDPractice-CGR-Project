@@ -1,4 +1,4 @@
-const User = require('../model/User')
+const User = require('../models/User')
 
 //Get token from model create cookie and send res
 const sendTokenResponse = (user, statusCode, res) => {
@@ -69,12 +69,4 @@ exports.login = async (req, res, next) => {
   }
 
   sendTokenResponse(user, 200, res)
-}
-
-// @desc : Get your user's data
-// @route : GET /api/users/me
-// @access : Private (Me)
-exports.getMe = async (req, res, next) => {
-  const user = await User.findById(req.user.id);
-  res.status(200).json({success : true, data : user});
 }
