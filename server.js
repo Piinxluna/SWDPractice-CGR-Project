@@ -27,9 +27,11 @@ app.use(cookieParser())
 // Routing
 const campgrounds = require('./routes/campgrounds')
 const auth = require('./routes/auth')
+const users = require('./routes/user')
 
 app.use('/api/campgrounds', campgrounds)
 app.use('/api/auth', auth)
+app.use('/api/users', users)
 // const campgrounds = require('./routes/campgrounds')
 // app.use('/api/auth')
 // const campgrounds = require('./routes/campgrounds')
