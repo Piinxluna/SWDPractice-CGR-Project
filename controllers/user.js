@@ -124,17 +124,23 @@ exports.updateUser = async (req, res, next) => {
 // @access : Admin
 exports.updateUserRole = async (req, res, next) => {
   const { role } = req.body
-  if (!role) {
-    return res
-      .status(400)
-      .json({ success: false, message: 'Please provide a role to update' })
+  const validRoles = ['admin', 'customer']
+  if (!role || !validRoles.includes(role)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid role to update',
+    })
   }
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.uid, role, {
-      new: true,
-      runValidators: true,
-    })
+    const user = await User.findByIdAndUpdate(
+      req.params.uid,
+      { role },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
 
     if (!user) {
       return res
