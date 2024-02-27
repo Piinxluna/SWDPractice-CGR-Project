@@ -1,7 +1,7 @@
 const Campground = require('../models/Campground')
 
 // @desc    Create a new site for campground
-// @route   /api/campgrounds/:cgid/sites
+// @route   POST /api/campgrounds/:cgid/sites
 // @access  Admin
 exports.createCampgroundSite = async (req, res, next) => {
   try {
@@ -42,7 +42,7 @@ exports.createCampgroundSite = async (req, res, next) => {
     const updatedCampground = await Campground.findByIdAndUpdate(
       req.params.cgid,
       { $push: { sites: { zone, number, size } } },
-      { runValidators: true }
+      { new: true, runValidators: true }
     )
     if (!updatedCampground) {
       return res
@@ -53,12 +53,13 @@ exports.createCampgroundSite = async (req, res, next) => {
     // Send response
     res.status(201).json({ sucess: true, data: updatedCampground })
   } catch (err) {
+    console.log(err.stack)
     res.status(400).json({ sucess: false })
   }
 }
 
 // @desc    Get a campground site in specific campground
-// @route   /api/campgrounds/:cgid/sites/:sid
+// @route   GET /api/campgrounds/:cgid/sites/:sid
 // @access  Public
 exports.getCampgroundSite = async (req, res, next) => {
   try {
@@ -83,6 +84,7 @@ exports.getCampgroundSite = async (req, res, next) => {
     // Send response
     res.status(200).json({ sucess: true, data: campground })
   } catch (err) {
+    console.log(err.stack)
     res.status(400).json({ success: false })
   }
 }
