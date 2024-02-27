@@ -2,19 +2,24 @@ const User = require('../models/User')
 
 //Get token from model create cookie and send res
 const sendTokenResponse = (user, statusCode, res) => {
-  // Create token 
-  const token = user.getSignedJwtToken();
+  // Create token
+  const token = user.getSignedJwtToken()
 
   const options = {
-    expires : new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
-    httpOnly : true
-  };
-
-  if(process.env.NODE_ENV === 'production'){
-    options.secure = true;
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
   }
 
-  res.status(statusCode).cookie('token', token, options).json({sucess : true, token});
+  if (process.env.NODE_ENV === 'production') {
+    options.secure = true
+  }
+
+  res
+    .status(statusCode)
+    .cookie('token', token, options)
+    .json({ sucess: true, token })
 }
 
 // @desc    Create a new user (create and return token, save token in cookie)
@@ -22,7 +27,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const {name, tel, email, password, role} = req.body
+    const { name, tel, email, password, role } = req.body
 
     //Create user
     const user = await User.create({
@@ -30,13 +35,12 @@ exports.register = async (req, res, next) => {
       tel,
       email,
       password,
-      role
+      role,
     })
 
     sendTokenResponse(user, 200, res)
-  }
-  catch(err){
-    res.status(400).json({sucess : false})
+  } catch (err) {
+    res.status(400).json({ sucess: false })
     console.log(err.stack)
   }
 }
@@ -45,27 +49,27 @@ exports.register = async (req, res, next) => {
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = async (req, res, next) => {
-  const {email, password} = req.body
-  const resEmailPassword = res.status(400).json({sucess: false, msg : 'Please provide email and password'})
-  const resCredentials = res.status(400).json({sucess: false, msg : 'Invalid Credentials'})
+  const { email, password } = req.body
 
   //Check if email and password is valid
-  if(!email || !password){
-    return resEmailPassword
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ sucess: false, msg: 'Please provide email and password' })
   }
 
-  const user = await User.findOne({email}).select('+password');
+  const user = await User.findOne({ email }).select('+password')
 
-  //Check if find the user or not 
-  if(!user){
-    return resCredentials
+  //Check if find the user or not
+  if (!user) {
+    return res.status(400).json({ sucess: false, msg: 'Invalid Credentials' })
   }
 
   //Check if password match
-  const isMatch = await user.matchPassword(password);
+  const isMatch = await user.matchPassword(password)
 
-  if(!isMatch){
-    return resCredentials
+  if (!isMatch) {
+    return res.status(400).json({ sucess: false, msg: 'Invalid Credentials' })
   }
 
   sendTokenResponse(user, 200, res)
