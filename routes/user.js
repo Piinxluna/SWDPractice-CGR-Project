@@ -17,3 +17,5 @@ router.route('/').get(protect, authorize('admin'), getUsers)
 router.route('/me').get(protect, getMe)
 router.route('/:uid').get(protect, authorize('admin'), getUser)
 router.route('/update-role/:uid').put(protect, authorize('admin'), updateUserRole)
+
+module.exports = router
