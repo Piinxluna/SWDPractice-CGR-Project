@@ -1,6 +1,7 @@
 // import express & dotenv
 const express = require('express')
 const dotenv = require('dotenv')
+const cookieParser = require('cookie-parser')
 const connectDB = require('./config/db')
 
 // Load env vars
@@ -14,17 +15,14 @@ const app = express()
 
 // Body JSON Parser
 app.use(express.json())
-
-app.get('/', (req, res) => {
-  res.status(200).json({ success: true })
-})
+app.use(cookieParser())
 
 // Routing Tester
-app.get('/', (req, res) => {
-  res.status(200).json({ success: true })
-})
-const tests = require('./routes/test')
-app.use('/test', tests)
+// app.get('/', (req, res) => {
+//   res.status(200).json({ success: true })
+// })
+// const tests = require('./routes/test')
+// app.use('/test', tests)
 
 // Routing
 const campgrounds = require('./routes/campgrounds')
