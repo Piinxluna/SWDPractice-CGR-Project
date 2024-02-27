@@ -14,19 +14,10 @@ exports.createCampgroundSite = async (req, res, next) => {
     }
 
     // Check if new site's data is valid
-    const newSite = req.body
+    const { zone, number, size } = req.body
     let isOk = true
 
-    let countKey = 0
-    let validKey = ['zone', 'number', 'size']
-    for (key in newSite) {
-      countKey++
-      if (validKey.includes[key]) {
-        isOk = false
-        break
-      }
-    }
-    if (countKey !== 3) {
+    if (!zone || !number || !size) {
       isOk = false
     }
     if (!isOk) {
@@ -35,8 +26,9 @@ exports.createCampgroundSite = async (req, res, next) => {
         .json({ sucess: false, message: "The new site's data is not valid" })
     }
 
+    // Check if new site's data is duplicated
     campground.sites.forEach((element) => {
-      if (element.zone === newSite.zone && element.number === newSite.number) {
+      if (element.zone === zone && element.number === number) {
         isOk = false
       }
     })
@@ -49,7 +41,7 @@ exports.createCampgroundSite = async (req, res, next) => {
     // Add new site to a campground
     const updatedCampground = await Campground.findByIdAndUpdate(
       req.params.cgid,
-      { $push: { sites: req.body } },
+      { $push: { sites: { zone, number, size } } },
       { runValidators: true }
     )
     if (!updatedCampground) {
