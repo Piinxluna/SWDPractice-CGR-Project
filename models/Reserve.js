@@ -16,6 +16,10 @@ const ReserveSchema = new mongoose.Schema({
     ref: 'Campground.sites',
     required: [true, 'Please add a campground site'],
   },
+  prefferedName: {
+    type: String,
+    require: [true, 'Please add your preferred name'],
+  },
   startDate: { type: Date, require: [true, 'Please add a start date'] },
   endDate: { type: Date, require: [true, 'Please add an end date'] },
   tentSize: {
