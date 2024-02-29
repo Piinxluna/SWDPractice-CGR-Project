@@ -5,14 +5,6 @@ const Campground = require('../models/Campground')
 // @access  Admin
 exports.createCampgroundSite = async (req, res, next) => {
   try {
-    // Check if there is a valid campground
-    const campground = await Campground.findById(req.params.cgid)
-    if (!campground) {
-      return res
-        .status(400)
-        .json({ sucess: false, message: 'Cannot find this campground' })
-    }
-
     // Check if new site's data is valid
     const { zone, number, size } = req.body
     if (!zone || !number || !size) {
@@ -22,31 +14,25 @@ exports.createCampgroundSite = async (req, res, next) => {
     }
     const newSite = { zone, number, size }
 
-    // Check if new site's data is duplicated
-    campground.sites.forEach((element) => {
-      if (element.zone === zone && element.number === number) {
-        return res
-          .status(400)
-          .json({ sucess: false, message: "The new site's data is duplicated" })
-      }
-    })
-
-    // Add new site to a campground
-    const updatedCampground = await Campground.findByIdAndUpdate(
-      req.params.cgid,
-      { $push: { sites: newSite } },
-      { runValidators: true }
+    // Check if there is a valid campground, no duplicated site and Create new site
+    const campground = await Campground.findOneAndUpdate(
+      {
+        _id: req.params.cgid,
+        sites: { $not: { $elemMatch: { zone: zone, number: number } } },
+      },
+      { $push: { sites: newSite }, $inc: { amount: 1 } },
+      { new: true, runValidators: true }
     ).select('-sites')
-    if (!updatedCampground) {
-      return res
-        .status(400)
-        .json({ sucess: false, message: 'Cannot add the new site' })
+    if (!campground) {
+      return res.status(400).json({
+        sucess: false,
+        message:
+          "Cannot find this campground or The new site's data is duplicated",
+      })
     }
 
     // Send response
-    res
-      .status(201)
-      .json({ sucess: true, campground: updatedCampground, newSite })
+    res.status(201).json({ sucess: true, campground, newSite })
   } catch (err) {
     console.log(err.stack)
     res.status(400).json({ sucess: false })
@@ -59,22 +45,20 @@ exports.createCampgroundSite = async (req, res, next) => {
 exports.getCampgroundSite = async (req, res, next) => {
   try {
     // Find a campground
-    let campground = await Campground.findById(req.params.cgid)
+    let campground = await Campground.findOne({
+      _id: req.params.cgid,
+      sites: { $elemMatch: { _id: req.params.sid } },
+    })
     if (!campground) {
       return res
         .status(400)
-        .json({ success: false, message: 'Cannot find this campground' })
+        .json({ success: false, message: 'Cannot find this campground site' })
     }
 
     // Find a site in a campground & Delete unmatch sites
     let site = campground.sites.find((element) => {
       return element.id === req.params.sid
     })
-    if (!site) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Cannot find this site' })
-    }
 
     // Delete other sites & Send response
     campground = campground.toJSON()
