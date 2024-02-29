@@ -21,8 +21,8 @@ app.use(cookieParser())
 // app.get('/', (req, res) => {
 //   res.status(200).json({ success: true })
 // })
-const tests = require('./routes/test')
-app.use('/test', tests)
+// const tests = require('./routes/test')
+// app.use('/test', tests)
 
 // Routing
 const campgrounds = require('./routes/campgrounds')
