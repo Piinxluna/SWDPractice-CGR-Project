@@ -67,17 +67,19 @@ exports.getCampgroundSite = async (req, res, next) => {
     }
 
     // Find a site in a campground & Delete unmatch sites
-    campground.sites = campground.sites.filter(
-      (element) => element.id === req.params.sid
-    )
-    if (campground.sites.length === 0) {
+    let site = campground.sites.find((element) => {
+      return element.id === req.params.sid
+    })
+    if (!site) {
       return res
         .status(400)
         .json({ success: false, message: 'Cannot find this site' })
     }
 
-    // Send response
-    res.status(200).json({ sucess: true, data: campground })
+    // Delete other sites & Send response
+    campground = campground.toJSON()
+    delete campground.sites
+    res.status(200).json({ sucess: true, campground, site })
   } catch (err) {
     console.log(err.stack)
     res.status(400).json({ success: false })
