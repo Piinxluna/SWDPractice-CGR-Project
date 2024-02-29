@@ -88,3 +88,28 @@ exports.getCampgroundSite = async (req, res, next) => {
     res.status(400).json({ success: false })
   }
 }
+
+// @desc    Delete a campground site in specific campground
+// @route   DEL /api/campgrounds/:cgid/sites/:sid
+// @access  Admin
+exports.deleteCampgroundSite = async (req, res, next) => {
+  try {
+    // Check if there is a valid campground
+    const campground = await Campground.findOneAndUpdate(
+      { _id: req.params.cgid },
+      { $pull: { sites: { _id: req.params.sid } } },
+      { safe: true, multi: false, new: true }
+    )
+    if (!campground) {
+      return res
+        .status(400)
+        .json({ sucess: false, message: 'Cannot find this campground' })
+    }
+
+    // Send response
+    res.status(200).json({ sucess: true, data: campground })
+  } catch (err) {
+    console.log(err.stack)
+    res.status(400).json({ sucess: false })
+  }
+}
