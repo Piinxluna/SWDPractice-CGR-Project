@@ -8,7 +8,7 @@ const {
   updateUserRole,
   deleteMe,
   deleteUser,
-} = require('../controllers/user')
+} = require('../controllers/users')
 
 const router = express.Router()
 const { protect, authorize } = require('../middleware/auth')

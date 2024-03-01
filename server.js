@@ -27,17 +27,13 @@ app.use(cookieParser())
 // Routing
 const campgrounds = require('./routes/campgrounds')
 const auth = require('./routes/auth')
-const users = require('./routes/user')
+const users = require('./routes/users')
+const reserves = require('./routes/reserves')
 
 app.use('/api/campgrounds', campgrounds)
 app.use('/api/auth', auth)
 app.use('/api/users', users)
-// const campgrounds = require('./routes/campgrounds')
-// app.use('/api/auth')
-// const campgrounds = require('./routes/campgrounds')
-// app.use('/api/user')
-// const campgrounds = require('./routes/campgrounds')
-// app.use('/api/reserves')
+app.use('/api/reserves', reserves)
 
 // setting up port
 const PORT = process.env.PORT || 5000
