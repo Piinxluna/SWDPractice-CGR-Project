@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 
 const SiteSchema = new mongoose.Schema({
+  campground:{
+    type: mongoose.Schema.ObjectId,
+    ref: 'Campground',
+    required: [true, 'Please add a campground'],
+  },
   zone: String,
   number: {
     type: Number,

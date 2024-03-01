@@ -131,7 +131,7 @@ exports.createReserve = async (req, res, next) => {
       return res.status(400).json({success : false, massage : 'Cannot find this site'});
     }
 
-    if(campgroundSite.sites.size.slength < req.body.tentSize.slength || campgroundSite.sites.size.swidth < req.body.tentSize.swidth){
+    if(campgroundSite.sites[0].size.slength < req.body.tentSize.slength || campgroundSite.sites[0].size.swidth < req.body.tentSize.swidth){
       return res.status(400).json({success : false, massage : 'Your tent is too big'});
     }
 

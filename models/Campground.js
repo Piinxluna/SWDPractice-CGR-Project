@@ -50,7 +50,10 @@ const CampgroundSchema = new mongoose.Schema({
     min: 0,
     require: [true, 'Please add total amount'],
   },
-  sites: [Site.schema],
+  sites: [{
+    type: mongoose.Schema.ObjectId,
+    ref: 'Site',
+  }],
 })
 
 module.exports = mongoose.model('Campground', CampgroundSchema)
