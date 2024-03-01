@@ -38,7 +38,7 @@ exports.getCampgrounds = async (req, res, next) => {
       const sortBy = req.query.sort.split(',').join(' ')
       query = query.sort(sortBy)
     } else {
-      query = query.sort('-createdAt')
+      query = query.sort('name')
     }
 
     // Pagination

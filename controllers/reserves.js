@@ -27,20 +27,19 @@ exports.getReserves = async (req, res, next) => {
 
     queryStr = JSON.parse(queryStr)
 
-    if (req.params.sid && req.params.cgid) {
-      queryStr.campground = req.params.cgid
-      queryStr.site = req.params.sid
-    } else if (req.params.cgid) {
-      queryStr.campground = req.params.cgid
-    } else if (req.params.uid) {
-      queryStr.user = req.params.uid
-    }
-
     if (req.user.role !== 'admin') {
       queryStr.user = req.user.id
+    } else {
+      if (req.params.sid && req.params.cgid) {
+        queryStr.campground = req.params.cgid
+        queryStr.site = req.params.sid
+      } else if (req.params.cgid) {
+        queryStr.campground = req.params.cgid
+      } else if (req.params.uid) {
+        queryStr.user = req.params.uid
+      }
     }
 
-    console.log(queryStr)
     query = Reserve.find(queryStr)
       .populate({
         path: 'campground',
@@ -50,13 +49,15 @@ exports.getReserves = async (req, res, next) => {
         path: 'user',
         select: 'tel',
       })
+      .populate({
+        path: 'site',
+        select: 'zone number size',
+      })
 
     // Select field
     if (req.query.select) {
       const fields = req.query.select.split(',').join(' ')
       query = query.select(fields)
-    } else {
-      query = query.select('-sites')
     }
 
     // Sort field
@@ -129,8 +130,13 @@ exports.createReserve = async (req, res, next) => {
         .json({ success: false, massage: 'Cannot find this site' })
     }
 
-    if(campgroundSite.sites[0].size.slength < req.body.tentSize.slength || campgroundSite.sites[0].size.swidth < req.body.tentSize.swidth){
-      return res.status(400).json({success : false, massage : 'Your tent is too big'});
+    if (
+      campgroundSite.sites[0].size.slength < req.body.tentSize.slength ||
+      campgroundSite.sites[0].size.swidth < req.body.tentSize.swidth
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, massage: 'Your tent is too big' })
     }
 
     //Add user id to req.body
