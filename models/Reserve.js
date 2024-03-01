@@ -22,11 +22,11 @@ const ReserveSchema = new mongoose.Schema({
   },
   startDate: { type: Date, require: [true, 'Please add a start date'] },
   tentSize: {
-    width: { 
+    swidth: { 
       type: Number, 
       min: 0, 
       require: [true, 'Please add a tent width'] },
-    length: {
+    slength: {
       type: Number,
       min: 0,
       require: [true, 'Please add a tent length'],

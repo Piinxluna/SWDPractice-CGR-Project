@@ -8,12 +8,12 @@ const SiteSchema = new mongoose.Schema({
   },
   size: {
     type: {
-      width: {
+      swidth: {
         type: Number,
         min: 0,
         required: [true, 'Please add a site width'],
       },
-      length: {
+      slength: {
         type: Number,
         min: 0,
         required: [true, 'Please add a site length'],

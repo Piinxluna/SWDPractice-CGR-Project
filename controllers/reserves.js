@@ -131,12 +131,16 @@ exports.createReserve = async (req, res, next) => {
       return res.status(400).json({success : false, massage : 'Cannot find this site'});
     }
 
+    if(campgroundSite.sites.size.slength < req.body.tentSize.slength || campgroundSite.sites.size.swidth < req.body.tentSize.swidth){
+      return res.status(400).json({success : false, massage : 'Your tent is too big'});
+    }
+
     //Add user id to req.body
     req.body.user = req.user.id
 
     const userExistedReserve = await Reserve.find({user : req.user.id, startDate : {$gte : Date.now()}});
     const existedReserve = await Reserve.findOne({campground : req.params.cgid, site : req.params.sid, startDate : req.body.startDate});
-console.log(existedReserve);
+
     // Check if this slot is avalible
     if(existedReserve){
       return res.status(400).json({success : false, message : 'There are someone book this site at this time'});
