@@ -176,3 +176,30 @@ exports.createReserve = async (req, res, next) => {
     res.status(400).json({ success: false })
   }
 }
+
+// @desc : Delete a reserve
+// @route : DEL /api/reserves/:rid
+// @access : Admin & Private (Me)
+exports.deleteReserve = async (req, res, next) => {
+  try {
+    const reserve = await Reserve.findById(req.params.rid)
+    if (!reserve) {
+      return res
+        .status(400)
+        .json({ success: false, massage: 'Cannot find this reserve' })
+    }
+
+    if (req.user.role !== 'admin' && reserve.user.toString() !== req.user.id) {
+      return res.status(401).json({
+        success: false,
+        massage: 'User is not authorized to delete this reserve',
+      })
+    }
+
+    await reserve.deleteOne()
+    res.status(200).json({ success: true, data: {} })
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ success: false })
+  }
+}
