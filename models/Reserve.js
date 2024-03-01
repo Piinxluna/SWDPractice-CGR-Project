@@ -13,7 +13,7 @@ const ReserveSchema = new mongoose.Schema({
   },
   site: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Campground.sites',
+    ref: 'Site',
     required: [true, 'Please add a campground site'],
   },
   prefferedName: {

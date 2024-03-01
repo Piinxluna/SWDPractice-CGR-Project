@@ -1,7 +1,7 @@
 const express = require('express')
 const { getReserves, createReserve } = require('../controllers/reserves')
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
 
 const { protect, authorize } = require('../middleware/auth')
 
