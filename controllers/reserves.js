@@ -134,16 +134,16 @@ exports.createReserve = async (req, res, next) => {
     //Add user id to req.body
     req.body.user = req.user.id
 
-    const userExitedReserve = await Reserve.find({user : req.user.id});
-    const exitedReserve = await Reserve.find({campground : req.params.cgid, site : req.params.sid, startDate : req.body.startDate});
-
+    const userExistedReserve = await Reserve.find({user : req.user.id, startDate : {$gte : Date.now()}});
+    const existedReserve = await Reserve.findOne({campground : req.params.cgid, site : req.params.sid, startDate : req.body.startDate});
+console.log(existedReserve);
     // Check if this slot is avalible
-    if(exitedReserve){
-      return res(400).json({success : false, message : 'There are someone book this site at this time'});
+    if(existedReserve){
+      return res.status(400).json({success : false, message : 'There are someone book this site at this time'});
     }
 
     // Check if reserve more than 3
-    if(userExitedReserve.length >= 3 && req.user.role !== 'admin'){
+    if(userExistedReserve.length >= 3 && req.user.role !== 'admin'){
       return res.status(400).json({success : false, message : `User ID ${req.user.id} has 3 reserve`});
     } 
 
@@ -152,6 +152,7 @@ exports.createReserve = async (req, res, next) => {
     res.status(200).json({success : true, data : reserve});
   }
   catch(err){
-
+    console.log(err);
+    res.status(400).json({success : false})
   }
 }
