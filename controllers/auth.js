@@ -74,3 +74,18 @@ exports.login = async (req, res, next) => {
 
   sendTokenResponse(user, 200, res)
 }
+
+// @desc : Logout from user account and delete token
+// @route : GET /api/auth/logout
+// @access : Registered user
+exports.logout = async (req, res, next) => {
+  res.cookie('token', 'none', {
+    expires : new Date(Date.now() + 10 * 1000),
+    httpOnly : true
+  })
+
+  res.status(200).json({
+    success : true,
+    data : {}
+  })
+}

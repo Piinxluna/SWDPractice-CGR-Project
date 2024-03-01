@@ -4,6 +4,14 @@ const dotenv = require('dotenv')
 const cookieParser = require('cookie-parser')
 const connectDB = require('./config/db')
 
+//Security
+const mongoSanitize = require('express-mongo-sanitize')
+const helmet = require('helmet')
+const { xss } = require('express-xss-sanitizer')
+const rateLimit = require('express-rate-limit')
+const hpp = require('hpp')
+const cors = require('cors')
+
 // Load env vars
 dotenv.config({ path: './config/config.env' })
 
@@ -13,16 +21,21 @@ connectDB()
 // Create app
 const app = express()
 
+//Limit
+const limiter = rateLimit({
+  windowsMs: 10 * 60 * 1000,
+  max: 100,
+})
+
 // Body JSON Parser
 app.use(express.json())
 app.use(cookieParser())
-
-// Routing Tester
-// app.get('/', (req, res) => {
-//   res.status(200).json({ success: true })
-// })
-// const tests = require('./routes/test')
-// app.use('/test', tests)
+app.use(mongoSanitize())
+app.use(helmet())
+app.use(xss())
+app.use(limiter)
+app.use(hpp())
+app.use(cors())
 
 // Routing
 const campgrounds = require('./routes/campgrounds')
