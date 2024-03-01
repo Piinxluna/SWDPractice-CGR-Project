@@ -50,10 +50,6 @@ exports.getReserves = async (req, res, next) => {
         path: 'user',
         select: 'tel',
       })
-      .populate({
-        path: 'site',
-        select: 'zone number size',
-      })
 
     // Select field
     if (req.query.select) {
@@ -118,45 +114,64 @@ exports.getReserves = async (req, res, next) => {
 // @route : POST /api/campgrounds/:cgid/sites/:sid/reserves
 // @access : Registered user
 exports.createReserve = async (req, res, next) => {
-  try{
+  try {
     req.body.campground = req.params.cgid
     req.body.site = req.params.sid
 
     const campgroundSite = await Campground.findOne({
       _id: req.params.cgid,
-      sites: { $elemMatch: { _id: req.params.sid } }
+      sites: { $elemMatch: { _id: req.params.sid } },
     })
-    
-    if(!campgroundSite){
-      return res.status(400).json({success : false, massage : 'Cannot find this site'});
+
+    if (!campgroundSite) {
+      return res
+        .status(400)
+        .json({ success: false, massage: 'Cannot find this site' })
     }
 
-    if(campgroundSite.sites.size.slength < req.body.tentSize.slength || campgroundSite.sites.size.swidth < req.body.tentSize.swidth){
-      return res.status(400).json({success : false, massage : 'Your tent is too big'});
+    if (
+      campgroundSite.sites.size.slength < req.body.tentSize.slength ||
+      campgroundSite.sites.size.swidth < req.body.tentSize.swidth
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, massage: 'Your tent is too big' })
     }
 
     //Add user id to req.body
     req.body.user = req.user.id
 
-    const userExistedReserve = await Reserve.find({user : req.user.id, startDate : {$gte : Date.now()}});
-    const existedReserve = await Reserve.findOne({campground : req.params.cgid, site : req.params.sid, startDate : req.body.startDate});
+    const userExistedReserve = await Reserve.find({
+      user: req.user.id,
+      startDate: { $gte: Date.now() },
+    })
+    const existedReserve = await Reserve.findOne({
+      campground: req.params.cgid,
+      site: req.params.sid,
+      startDate: req.body.startDate,
+    })
 
     // Check if this slot is avalible
-    if(existedReserve){
-      return res.status(400).json({success : false, message : 'There are someone book this site at this time'});
+    if (existedReserve) {
+      return res.status(400).json({
+        success: false,
+        message: 'There are someone book this site at this time',
+      })
     }
 
     // Check if reserve more than 3
-    if(userExistedReserve.length >= 3 && req.user.role !== 'admin'){
-      return res.status(400).json({success : false, message : `User ID ${req.user.id} has 3 reserve`});
-    } 
+    if (userExistedReserve.length >= 3 && req.user.role !== 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: `User ID ${req.user.id} has 3 reserve`,
+      })
+    }
 
-    const reserve = await Reserve.create(req.body);
+    const reserve = await Reserve.create(req.body)
 
-    res.status(200).json({success : true, data : reserve});
-  }
-  catch(err){
-    console.log(err);
-    res.status(400).json({success : false})
+    res.status(200).json({ success: true, data: reserve })
+  } catch (err) {
+    console.log(err)
+    res.status(400).json({ success: false })
   }
 }

@@ -48,6 +48,9 @@ app.use('/api/auth', auth)
 app.use('/api/users', users)
 app.use('/api/reserves', reserves)
 
+const test = require('./routes/test')
+app.use('/test', test)
+
 // setting up port
 const PORT = process.env.PORT || 5000
 const server = app.listen(
