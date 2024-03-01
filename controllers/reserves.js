@@ -41,6 +41,18 @@ exports.getReserves = async (req, res, next) => {
 
     console.log(queryStr)
     query = Reserve.find(queryStr)
+      .populate({
+        path: 'campground',
+        select: 'name tel address',
+      })
+      .populate({
+        path: 'user',
+        select: 'tel',
+      })
+      .populate({
+        path: 'site',
+        select: 'zone number size',
+      })
 
     // Select field
     if (req.query.select) {

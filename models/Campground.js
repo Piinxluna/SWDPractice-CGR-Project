@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Site = require('./Site')
 
 const CampgroundSchema = new mongoose.Schema({
   name: {
@@ -49,29 +50,7 @@ const CampgroundSchema = new mongoose.Schema({
     min: 0,
     require: [true, 'Please add total amount'],
   },
-  sites: [
-    {
-      zone: String,
-      number: {
-        type: Number,
-        required: [true, 'Please add a unique site number'],
-      },
-      size: {
-        type: {
-          width: {
-            type: Number,
-            min: 0,
-            required: [true, 'Please add a site width'],
-          },
-          length: {
-            type: Number,
-            min: 0,
-            required: [true, 'Please add a site length'],
-          },
-        },
-      },
-    },
-  ],
+  sites: [Site.schema],
 })
 
 module.exports = mongoose.model('Campground', CampgroundSchema)
