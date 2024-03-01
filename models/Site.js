@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const SiteSchema = new mongoose.Schema({
-  campground:{
+  campground: {
     type: mongoose.Schema.ObjectId,
     ref: 'Campground',
     required: [true, 'Please add a campground'],
