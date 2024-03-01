@@ -10,6 +10,9 @@ const {
   deleteUser,
 } = require('../controllers/users')
 
+// Import others router
+const reservesRouter = require('./reserves')
+
 const router = express.Router()
 const { protect, authorize } = require('../middleware/auth')
 
@@ -20,12 +23,13 @@ router
   .put(protect, updateMe)
   .delete(protect, deleteMe)
 router
+  .route('/update-role/:uid')
+  .put(protect, authorize('admin'), updateUserRole)
+router
   .route('/:uid')
   .get(protect, authorize('admin'), getUser)
   .put(protect, authorize('admin'), updateUser)
   .delete(protect, authorize('admin'), deleteUser)
-router
-  .route('/update-role/:uid')
-  .put(protect, authorize('admin'), updateUserRole)
+router.use('/:uid/reserves', reservesRouter)
 
 module.exports = router

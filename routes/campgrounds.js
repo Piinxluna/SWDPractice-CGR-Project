@@ -11,6 +11,9 @@ const {
   deleteCampgroundSite,
 } = require('../controllers/campgroundSites')
 
+// Import others router
+const reservesRouter = require('./reserves')
+
 // Create a router
 const router = express.Router()
 
@@ -18,9 +21,11 @@ router.route('/').get(getCampgrounds)
 router
   .route('/:cgid/sites')
   .post(protect, authorize('admin'), createCampgroundSite)
+router.use('/:cgid/reserves', reservesRouter)
 router
   .route('/:cgid/sites/:sid')
   .get(getCampgroundSite)
   .delete(protect, authorize('admin'), deleteCampgroundSite)
+router.use('/:cgid/sites/:sid/reserves', reservesRouter)
 
 module.exports = router
