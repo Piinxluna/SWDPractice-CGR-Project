@@ -5,53 +5,34 @@ const Campground = require('../models/Campground')
 // @access  Admin
 exports.createCampgroundSite = async (req, res, next) => {
   try {
-    // Check if there is a valid campground
-    const campground = await Campground.findById(req.params.cgid)
-    if (!campground) {
-      return res
-        .status(400)
-        .json({ sucess: false, message: 'Cannot find this campground' })
-    }
-
     // Check if new site's data is valid
     const { zone, number, size } = req.body
-    let isOk = true
-
     if (!zone || !number || !size) {
-      isOk = false
-    }
-    if (!isOk) {
       return res
         .status(400)
         .json({ sucess: false, message: "The new site's data is not valid" })
     }
+    const newSite = { zone, number, size }
 
-    // Check if new site's data is duplicated
-    campground.sites.forEach((element) => {
-      if (element.zone === zone && element.number === number) {
-        isOk = false
-      }
-    })
-    if (!isOk) {
-      return res
-        .status(400)
-        .json({ sucess: false, message: "The new site's data is duplicated" })
-    }
-
-    // Add new site to a campground
-    const updatedCampground = await Campground.findByIdAndUpdate(
-      req.params.cgid,
-      { $push: { sites: { zone, number, size } } },
+    // Check if there is a valid campground, no duplicated site and Create new site
+    const campground = await Campground.findOneAndUpdate(
+      {
+        _id: req.params.cgid,
+        sites: { $not: { $elemMatch: { zone: zone, number: number } } },
+      },
+      { $push: { sites: newSite }, $inc: { amount: 1 } },
       { new: true, runValidators: true }
-    )
-    if (!updatedCampground) {
-      return res
-        .status(400)
-        .json({ sucess: false, message: 'Cannot add the new site' })
+    ).select('-sites')
+    if (!campground) {
+      return res.status(400).json({
+        sucess: false,
+        message:
+          "Cannot find this campground or The new site's data is duplicated",
+      })
     }
 
     // Send response
-    res.status(201).json({ sucess: true, data: updatedCampground })
+    res.status(201).json({ sucess: true, campground, newSite })
   } catch (err) {
     console.log(err.stack)
     res.status(400).json({ sucess: false })
@@ -64,25 +45,25 @@ exports.createCampgroundSite = async (req, res, next) => {
 exports.getCampgroundSite = async (req, res, next) => {
   try {
     // Find a campground
-    let campground = await Campground.findById(req.params.cgid)
+    let campground = await Campground.findOne({
+      _id: req.params.cgid,
+      sites: { $elemMatch: { _id: req.params.sid } },
+    })
     if (!campground) {
       return res
         .status(400)
-        .json({ success: false, message: 'Cannot find this campground' })
+        .json({ success: false, message: 'Cannot find this campground site' })
     }
 
     // Find a site in a campground & Delete unmatch sites
-    campground.sites = campground.sites.filter(
-      (element) => element.id === req.params.sid
-    )
-    if (campground.sites.length === 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Cannot find this site' })
-    }
+    let site = campground.sites.find((element) => {
+      return element.id === req.params.sid
+    })
 
-    // Send response
-    res.status(200).json({ sucess: true, data: campground })
+    // Delete other sites & Send response
+    campground = campground.toJSON()
+    delete campground.sites
+    res.status(200).json({ sucess: true, campground, site })
   } catch (err) {
     console.log(err.stack)
     res.status(400).json({ success: false })
@@ -94,7 +75,17 @@ exports.getCampgroundSite = async (req, res, next) => {
 // @access  Admin
 exports.deleteCampgroundSite = async (req, res, next) => {
   try {
-    // Check if there is a valid campground
+    // Check if there is a valid campground & sites
+    const site = await Campground.findOne({
+      _id: req.params.cgid,
+      sites: { $elemMatch: { _id: req.params.sid } },
+    })
+    if (!site) {
+      return res
+        .status(400)
+        .json({ sucess: false, message: 'Cannot find this campground site' })
+    }
+
     const campground = await Campground.findOneAndUpdate(
       { _id: req.params.cgid },
       { $pull: { sites: { _id: req.params.sid } } },
@@ -103,7 +94,7 @@ exports.deleteCampgroundSite = async (req, res, next) => {
     if (!campground) {
       return res
         .status(400)
-        .json({ sucess: false, message: 'Cannot find this campground' })
+        .json({ sucess: false, message: 'Cannot delete this campground site' })
     }
 
     // Send response

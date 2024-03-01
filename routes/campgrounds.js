@@ -4,6 +4,7 @@ const express = require('express')
 const { protect, authorize } = require('../middleware/auth')
 
 // Import controllers
+const { getCampgrounds } = require('../controllers/campground')
 const {
   createCampgroundSite,
   getCampgroundSite,
@@ -13,6 +14,7 @@ const {
 // Create a router
 const router = express.Router()
 
+router.route('/').get(getCampgrounds)
 router
   .route('/:cgid/sites')
   .post(protect, authorize('admin'), createCampgroundSite)
