@@ -1,10 +1,10 @@
 const express = require('express')
-const { getReserves } = require('../controllers/reserves')
+const { getReserves, createReserve } = require('../controllers/reserves')
 
 const router = express.Router()
 
-const { protect } = require('../middleware/auth')
+const { protect, authorize } = require('../middleware/auth')
 
-router.get('/', getReserves)
+router.route('/').get(protect, getReserves).post(protect, createReserve)
 
 module.exports = router

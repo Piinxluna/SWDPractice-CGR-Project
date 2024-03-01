@@ -14,6 +14,11 @@ const {
 // Create a router
 const router = express.Router()
 
+//Include other resource router
+const reserveRouter = require('./reserves')
+
+router.use(':cgid/sites/:sid/reserves', reserveRouter)
+
 router.route('/').get(getCampgrounds)
 router
   .route('/:cgid/sites')

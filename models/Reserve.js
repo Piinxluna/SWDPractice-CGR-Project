@@ -21,9 +21,11 @@ const ReserveSchema = new mongoose.Schema({
     require: [true, 'Please add your preferred name'],
   },
   startDate: { type: Date, require: [true, 'Please add a start date'] },
-  endDate: { type: Date, require: [true, 'Please add an end date'] },
   tentSize: {
-    width: { type: Number, min: 0, require: [true, 'Please add a tent width'] },
+    width: { 
+      type: Number, 
+      min: 0, 
+      require: [true, 'Please add a tent width'] },
     length: {
       type: Number,
       min: 0,
