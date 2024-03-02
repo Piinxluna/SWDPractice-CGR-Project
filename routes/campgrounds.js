@@ -27,7 +27,7 @@ const reserveRouter = require('./reserves')
 router.use(':cgid/sites/:sid/reserves', reserveRouter)
 
 router.route('/')
-  .get(protect , getCampgrounds)
+  .get(getCampgrounds)
   .post(protect , authorize('admin') ,createCampground)
 router.route('/:id')
   .get(getCampground)
