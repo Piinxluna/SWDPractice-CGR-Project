@@ -98,3 +98,23 @@ exports.getLog = async (req, res, next) => {
     return res.status(400).json({ sucess: false })
   }
 }
+
+// @desc : Delete a log detail
+// @route : DELETE /api/logs/:lid
+// @access : Admin
+exports.deleteLog = async (req, res, next) => {
+  try {
+    const log = await Log.findByIdAndDelete(req.params.lid)
+
+    if (!log) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Cannot find log' })
+    }
+
+    res.status(200).json({ success: true, data: {} })
+  } catch (err) {
+    console.log(err.stack)
+    res.status(400).json({ success: false })
+  }
+}
