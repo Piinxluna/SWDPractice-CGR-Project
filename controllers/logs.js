@@ -77,3 +77,44 @@ exports.getLogs = async (req, res, next) => {
     return res.status(400).json({ sucess: false })
   }
 }
+
+// @desc : Get a log detail
+// @route : GET /api/logs/:lid
+// @access : Admin
+exports.getLog = async (req, res, next) => {
+  try{
+    const log = await Log.findById(req.params.lid)
+
+    if (!log) {
+      return res
+        .status(400)
+        .json({ sucess: false, message: 'Not found log with this id' })
+    }
+    
+    return res.status(200).json({ success: true, data: log })
+  }
+  catch(err){
+    console.log(err.stack)
+    return res.status(400).json({ sucess: false })
+  }
+}
+
+// @desc : Delete a log detail
+// @route : DELETE /api/logs/:lid
+// @access : Admin
+exports.deleteLog = async (req, res, next) => {
+  try {
+    const log = await Log.findByIdAndDelete(req.params.lid)
+
+    if (!log) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Cannot find log' })
+    }
+
+    res.status(200).json({ success: true, data: {} })
+  } catch (err) {
+    console.log(err.stack)
+    res.status(400).json({ success: false })
+  }
+}
