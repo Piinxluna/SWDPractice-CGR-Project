@@ -38,7 +38,7 @@ const CampgroundSchema = new mongoose.Schema({
     link: String,
   },
   website: String,
-  pictures: [String],
+  image: String,
   facilities: [String],
   tentForRent: {
     type: Boolean,

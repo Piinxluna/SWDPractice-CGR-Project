@@ -1,5 +1,20 @@
 const Campground = require('../models/Campground')
 
+const multer = require('multer')
+const fs = require('fs')
+const path = require('path')
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, 'campgroundImage')
+  },
+  filename: (req, file, cb) => {
+      cb(null, file.fieldname + '-' + Date.now() + '.png')
+  }
+})
+
+const upload = multer({ storage: storage })
+
 // @desc : Get all campgrounds (with filter, sort, select and pagination)
 // @route : GET /api/campgrounds
 // @access : Public
@@ -84,13 +99,39 @@ exports.getCampgrounds = async (req, res, next) => {
     return res.status(400).json({ sucess: false })
   }
 }
-exports.createCampground = async (req,res,next) =>{
-  const campground = await Campground.create(req.body);
-  return res.status(201).json({
-    success:true,
-    data : campground
-  });
-};
+exports.createCampground = async (req, res, next) => {
+  try {
+    upload.single('file')(req, res, async function (err) {
+      if (err) {
+        console.error('File upload error:', err);
+        return res.status(400).json({ success: false, message: 'Error uploading file' });
+      }
+
+      // Multer middleware has processed the file, and req.file is available here
+      if (!req.file) {
+        req.body.image = null
+        const campground = await Campground.create(req.body);
+        return res.status(200).json({ 
+          success: true,
+          data: campground,
+          message: 'No file uploaded' 
+        });
+      }
+
+      // Assuming req.file is available and contains the uploaded file information
+      req.body.image = req.file.filename
+
+      const campground = await Campground.create(req.body);
+      return res.status(201).json({
+        success: true,
+        data: campground
+      })
+    })
+  } catch (err) {
+    console.error('Error creating campground:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+}
 
 exports.getCampground = async (req,res,next) =>{
   try{
