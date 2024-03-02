@@ -73,7 +73,7 @@ exports.getUsers = async (req, res, next) => {
     }
 
     //Pagination
-    const page = parseInt(req.query.page, 10) || 1 
+    const page = parseInt(req.query.page, 10) || 1
     const limit = parseInt(req.query.limit, 10) || 25
     const startIndex = (page - 1) * limit
     const endIndex = page * limit
@@ -218,13 +218,15 @@ exports.updateUserRole = async (req, res, next) => {
 // @access : Private (Me)
 exports.deleteMe = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.user.id)
+    const user = await User.findById(req.user.id)
 
     if (!user) {
       return res
         .status(400)
         .json({ success: false, message: 'Cannot find user' })
     }
+
+    await user.deleteOne()
 
     res.status(200).json({ success: true, data: {} })
   } catch (err) {
@@ -238,13 +240,15 @@ exports.deleteMe = async (req, res, next) => {
 // @access : Admin
 exports.deleteUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.uid)
+    const user = await User.findById(req.params.uid)
 
     if (!user) {
       return res
         .status(400)
         .json({ success: false, message: 'Cannot find user' })
     }
+
+    await user.deleteOne()
 
     res.status(200).json({ success: true, data: {} })
   } catch (err) {
