@@ -1,4 +1,6 @@
 const User = require('../models/User')
+const Log = require('../models/Log')
+const jwt = require('jsonwebtoken')
 
 //Get token from model create cookie and send res
 const sendTokenResponse = (user, statusCode, res) => {
@@ -38,6 +40,13 @@ exports.register = async (req, res, next) => {
       role,
     })
 
+    const log = await Log.create({ user: user.id, action: 'login' })
+    if (!log) {
+      return res
+        .status(400)
+        .json({ sucess: false, message: 'Cannot create log for this login' })
+    }
+
     sendTokenResponse(user, 200, res)
   } catch (err) {
     res.status(400).json({ sucess: false })
@@ -72,6 +81,13 @@ exports.login = async (req, res, next) => {
     return res.status(400).json({ sucess: false, msg: 'Invalid Credentials' })
   }
 
+  const log = await Log.create({ user: user.id, action: 'login' })
+  if (!log) {
+    return res
+      .status(400)
+      .json({ sucess: false, message: 'Cannot create log for this login' })
+  }
+
   sendTokenResponse(user, 200, res)
 }
 
@@ -79,13 +95,43 @@ exports.login = async (req, res, next) => {
 // @route : GET /api/auth/logout
 // @access : Registered user
 exports.logout = async (req, res, next) => {
+  // Check if user is login
+  let token
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1]
+  }
+
+  if (!token || token == 'null') {
+    return res.status(200).json({
+      sucess: true,
+      data: {},
+    })
+  }
+
+  // Create log
+  const decode = jwt.verify(
+    req.headers.authorization.split(' ')[1],
+    process.env.JWT_SECRET
+  )
+  const log = await Log.create({ user: decode.id, action: 'logout' })
+  if (!log) {
+    return res
+      .status(400)
+      .json({ sucess: false, message: 'Cannot create log for this login' })
+  }
+
+  // Delete token
   res.cookie('token', 'none', {
-    expires : new Date(Date.now() + 10 * 1000),
-    httpOnly : true
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
   })
 
   res.status(200).json({
-    success : true,
-    data : {}
+    success: true,
+    data: {},
   })
 }

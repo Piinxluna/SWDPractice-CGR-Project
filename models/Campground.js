@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Site = require('./Site')
 
 const CampgroundSchema = new mongoose.Schema({
   name: {
@@ -50,10 +49,12 @@ const CampgroundSchema = new mongoose.Schema({
     min: 0,
     require: [true, 'Please add total amount'],
   },
-  sites: [{
-    type: mongoose.Schema.ObjectId,
-    ref: 'Site',
-  }],
+  sites: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Site',
+    },
+  ],
 })
 
 module.exports = mongoose.model('Campground', CampgroundSchema)

@@ -42,14 +42,15 @@ const campgrounds = require('./routes/campgrounds')
 const auth = require('./routes/auth')
 const users = require('./routes/users')
 const reserves = require('./routes/reserves')
+const logs = require('./routes/logs')
 
 app.use('/api/campgrounds', campgrounds)
 app.use('/api/auth', auth)
 app.use('/api/users', users)
 app.use('/api/reserves', reserves)
 
-const test = require('./routes/test')
-app.use('/test', test)
+// const test = require('./routes/test')
+// app.use('/test', test)
 
 // setting up port
 const PORT = process.env.PORT || 5000
