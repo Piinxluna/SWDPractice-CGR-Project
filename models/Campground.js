@@ -30,6 +30,10 @@ const CampgroundSchema = new mongoose.Schema({
       type: String,
       require: [true, 'Please add a district'],
     },
+    province: {
+      type: String,
+      require: [true, 'Please add a province'],
+    },
     postalCode: {
       type: String,
       pattern: '^[0-9]{5}$',
