@@ -1,4 +1,5 @@
 const Campground = require('../models/Campground')
+const Site = require('../models/Site')
 const Reserve = require('../models/Reserve')
 
 // @desc    Get all reserve (with filter, sort, select and pagination)
@@ -119,9 +120,9 @@ exports.createReserve = async (req, res, next) => {
     req.body.campground = req.params.cgid
     req.body.site = req.params.sid
 
-    const campgroundSite = await Campground.findOne({
-      _id: req.params.cgid,
-      sites: { $elemMatch: { _id: req.params.sid } },
+    const campgroundSite = await Site.findOne({
+      _id : req.params.sid,
+      campground : req.params.cgid
     })
 
     if (!campgroundSite) {
@@ -131,8 +132,8 @@ exports.createReserve = async (req, res, next) => {
     }
 
     if (
-      campgroundSite.sites[0].size.slength < req.body.tentSize.slength ||
-      campgroundSite.sites[0].size.swidth < req.body.tentSize.swidth
+      campgroundSite.size.slength < req.body.tentSize.slength ||
+      campgroundSite.size.swidth < req.body.tentSize.swidth
     ) {
       return res
         .status(400)
