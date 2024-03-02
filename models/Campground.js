@@ -18,10 +18,7 @@ const CampgroundSchema = new mongoose.Schema({
       require: [true, 'Please add a house number'],
     },
     lane: String,
-    road: {
-      type: String,
-      require: [true, 'Please add a road'],
-    },
+    road: String,
     subDistrict: {
       type: String,
       require: [true, 'Please add a sub district'],
