@@ -72,14 +72,12 @@ exports.getCampgrounds = async (req, res, next) => {
     }
 
     // Send response
-    return res
-      .status(200)
-      .json({
-        success: true,
-        count: campgrounds.length,
-        pagination,
-        data: campgrounds,
-      })
+    return res.status(200).json({
+      success: true,
+      count: campgrounds.length,
+      pagination,
+      data: campgrounds,
+    })
   } catch (err) {
     // console.log(err.stack)
     return res.status(500).json({ success: false })

@@ -31,6 +31,39 @@ exports.register = async (req, res, next) => {
   try {
     const { name, tel, email, password, role } = req.body
 
+    if (!name || !tel || !email || !password || !role) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all the user's require data",
+      })
+    }
+
+    // Test validate
+    const testUserValidation = new User({
+      name,
+      tel,
+      email,
+      password,
+      role,
+    })
+    const error = testUserValidation.validateSync()
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: "The user's data is invalid" })
+    }
+
+    // Check if duplicate user or not
+    const checkDuplicateUser = await User.findOne({
+      $or: [{ email: email }, { tel: tel }],
+    })
+    if (checkDuplicateUser) {
+      return res.status(400).json({
+        success: false,
+        message: "The user's email or telephone number is duplicated",
+      })
+    }
+
     // Create user
     const user = await User.create({
       name,
@@ -45,13 +78,12 @@ exports.register = async (req, res, next) => {
     if (!log) {
       return res
         .status(400)
-        .json({ success: false, message: 'Cannot create log for this login' })
+        .json({ sucess: false, message: 'Cannot create log for this login' })
     }
 
     sendTokenResponse(user, 201, res)
   } catch (err) {
-    console.log(err.stack)
-    res.status(400).json({ success: false })
+    res.status(500).json({ success: false })
   }
 }
 
