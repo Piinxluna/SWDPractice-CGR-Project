@@ -1,6 +1,6 @@
-const Campground = require('../models/Campground')
 const Site = require('../models/Site')
 const Reserve = require('../models/Reserve')
+const User = require('../models/User')
 
 // @desc    Get a reserve
 // @route   GET /api/reserves/:rid
@@ -159,15 +159,19 @@ exports.getReserves = async (req, res, next) => {
 // @access : Registered user
 exports.createReserve = async (req, res, next) => {
   try {
-    const { preferredName, startDate, tentSize, amount } = req.body
+    const { startDate, tentSize, amount } = req.body
     if (!startDate || !tentSize || !amount) {
       return res.status(400).json({
         success: false,
         message: "Please provide all the reserve's require data",
       })
     }
+
+    let { preferredName } = req.body
     if (!preferredName) {
-      preferredName = await User.findById(req.user.id).select('name')
+      console.log('test')
+      preferredName = await User.findById(req.user.id)
+      console.log(preferredName)
     }
 
     const data = {
