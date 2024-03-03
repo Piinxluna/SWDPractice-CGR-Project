@@ -31,7 +31,7 @@ exports.getReserve = async (req, res, next) => {
       reserve.user.id.toString() !== req.user.id &&
       req.user.role !== 'admin'
     ) {
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
         message: 'Customer is not authorized to get this reserve',
       })
@@ -169,9 +169,8 @@ exports.createReserve = async (req, res, next) => {
 
     let { preferredName } = req.body
     if (!preferredName) {
-      console.log('test')
-      preferredName = await User.findById(req.user.id)
-      console.log(preferredName)
+      preferredName = await User.findById(req.user.id).select('name')
+      preferredName = preferredName.name
     }
 
     const data = {
@@ -257,7 +256,7 @@ exports.updateReserve = async (req, res, next) => {
 
     //make sure user is the appointment owner
     if (reserve.user.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
         message: `Customer ${req.user.id} is not authorized to update this reserve`,
       })
@@ -290,7 +289,7 @@ exports.deleteReserve = async (req, res, next) => {
     }
 
     if (req.user.role !== 'admin' && reserve.user.toString() !== req.user.id) {
-      return res.status(401).json({
+      return res.status(403).json({
         success: false,
         massage: 'User is not authorized to delete this reserve',
       })
