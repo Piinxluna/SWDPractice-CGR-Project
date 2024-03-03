@@ -18,7 +18,8 @@ const {
   createCampgroundSite,
   getCampgroundSite,
   deleteCampgroundSite,
-  getCampgroundSites
+  getCampgroundSites,
+  updateCampgroundSite
 } = require('../controllers/campgroundSites')
 
 // Import others router
@@ -41,6 +42,7 @@ router.route('/:cgid/sites')
   .post(protect , authorize('admin') ,createCampgroundSite)
 router.route('/:cgid/sites/:sid')
   .get(getCampgroundSite)
+  .put(protect, authorize('admin') , updateCampgroundSite)
   .delete(protect, authorize('admin'), deleteCampgroundSite)
 
 module.exports = router
