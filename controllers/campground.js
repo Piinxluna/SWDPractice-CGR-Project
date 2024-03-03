@@ -115,7 +115,7 @@ exports.createCampground = async (req,res,next) =>{
     const { houseNumber, lane, road, subDistrict, district, province, postalCode, link} = address
 
     if(!name || !tel || !tentForRent || !houseNumber || !subDistrict || !district || !province || !postalCode){
-      // console.log(name + tel + tentForRent + houseNumber + subDistrict + district + province + postalCode);
+      console.log(name + tel + tentForRent + houseNumber + subDistrict + district + province + postalCode);
       return res
         .status(400)
         .json({ success : false, message : 'Please enter all required data'})

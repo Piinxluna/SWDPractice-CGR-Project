@@ -12,7 +12,10 @@ const UserSchema = new mongoose.Schema({
     minLength: 10,
     maxLength: 20,
     unique: true,
-    pattern: '^([0-9]{3}|[0-9]{2})-[0-9]{3}-[0-9]{4}$',
+    match: [
+      /^([0-9]{3}|[0-9]{2})-[0-9]{3}-[0-9]{4}$/, 
+      'Please add a valid tel'
+    ],
   },
   email: {
     type: String,
