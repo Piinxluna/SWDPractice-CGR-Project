@@ -73,8 +73,8 @@ exports.getLogs = async (req, res, next) => {
       .status(200)
       .json({ success: true, count: logs.length, pagination, data: logs })
   } catch (err) {
-    console.log(err.stack)
-    return res.status(400).json({ sucess: false })
+    // console.log(err.stack)
+    return res.status(500).json({ sucess: false })
   }
 }
 
@@ -87,15 +87,18 @@ exports.getLog = async (req, res, next) => {
 
     if (!log) {
       return res
-        .status(400)
+        .status(404)
         .json({ sucess: false, message: 'Not found log with this id' })
     }
     
-    return res.status(200).json({ success: true, data: log })
-  }
-  catch(err){
-    console.log(err.stack)
-    return res.status(400).json({ sucess: false })
+    return res
+      .status(200)
+      .json({ success: true, data: log })
+  } catch(err) {
+    // console.log(err.stack)
+    return res
+      .status(500)
+      .json({ sucess: false })
   }
 }
 
@@ -108,13 +111,18 @@ exports.deleteLog = async (req, res, next) => {
 
     if (!log) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, message: 'Cannot find log' })
     }
 
-    res.status(200).json({ success: true, data: {} })
+    return res
+      .status(200)
+      .json({ success: true, data: {} })
+
   } catch (err) {
-    console.log(err.stack)
-    res.status(400).json({ success: false })
+    // console.log(err.stack)
+    return res
+      .status(500)
+      .json({ success: false })
   }
 }

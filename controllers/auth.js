@@ -48,7 +48,7 @@ exports.register = async (req, res, next) => {
         .json({ sucess : false, message : 'Cannot create log for this login' })
     }
 
-    sendTokenResponse(user, 200, res)
+    sendTokenResponse(user, 201, res)
   } catch (err) {
     res.status(400).json({ sucess : false })
     // console.log(err.stack)

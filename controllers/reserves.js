@@ -5,39 +5,43 @@ const Reserve = require('../models/Reserve')
 // @desc    Get a reserve
 // @route   GET /api/reserves/:rid
 // @access  Admin & Private (me)
-exports.getReserve=async (req,res,next) => {
+exports.getReserve = async (req,res,next) => {
   try {
-    
-      const reserve = await Reserve.findById(req.params.rid).populate({
-        path: 'campground',
-        select: 'name tel address',
-      })
-      .populate({
-        path: 'user',
-        select: 'tel',
-      })
-      .populate({
-        path: 'site',
-        select: 'zone number size',
-      })
-console.log(reserve);
+    const reserve = await Reserve.findById(req.params.rid).populate({
+      path: 'campground',
+      select: 'name tel address',
+    })
+    .populate({
+      path: 'user',
+      select: 'tel',
+    })
+    .populate({
+      path: 'site',
+      select: 'zone number size',
+    })
 
-      if(!reserve) {
-          return res.status(404).json({success:false});
-      }
+    if(!reserve) {
+      return res
+        .status(404)
+        .json({success:false, message : 'Cannot find this reserve'})
+    }
 
-      if(reserve.user.toString()!==req.user.id && req.user.role !== 'admin'){
-        return res.status(401).json({success:false, msg : "Customer is not authorized to get this reserve"});
-      }
+    if(reserve.user.toString() !== req.user.id && req.user.role !== 'admin'){
+      return res
+        .status(401)
+        .json({success:false, message : 'Customer is not authorized to get this reserve'})
+    }
 
-      res.status(200).json({
-          success:true,
-          data:reserve
-      });
+    return res
+      .status(200)
+      .json({ success : true, data : reserve})
+
   }
   catch (error){
-      console.log(error);
-      return res.status(500).json({success:false});
+    // console.log(error);
+    return res
+      .status(500)
+      .json({success:false})
   }
 }
 
@@ -146,8 +150,8 @@ exports.getReserves = async (req, res, next) => {
       data: reserves,
     })
   } catch (err) {
-    console.log(err.stack)
-    return res.status(400).json({ sucess: false })
+    // console.log(err.stack)
+    return res.status(500).json({ sucess: false })
   }
 }
 
@@ -166,8 +170,8 @@ exports.createReserve = async (req, res, next) => {
 
     if (!campgroundSite) {
       return res
-        .status(400)
-        .json({ success: false, massage: 'Cannot find this site' })
+        .status(404)
+        .json({ success: false, message: 'Cannot find this site' })
     }
 
     if (
@@ -176,7 +180,7 @@ exports.createReserve = async (req, res, next) => {
     ) {
       return res
         .status(400)
-        .json({ success: false, massage: 'Your tent is too big' })
+        .json({ success : false, message : 'Your tent is too big' })
     }
 
     //Add user id to req.body
@@ -194,26 +198,29 @@ exports.createReserve = async (req, res, next) => {
 
     // Check if this slot is avalible
     if (existedReserve) {
-      return res.status(400).json({
-        success: false,
-        message: 'There are someone book this site at this time',
-      })
+      return res
+        .status(400)
+        .json({ success : false, message : 'There are someone book this site at this time' })
     }
 
     // Check if reserve more than 3
     if (userExistedReserve.length >= 3 && req.user.role !== 'admin') {
-      return res.status(400).json({
-        success: false,
-        message: `User ID ${req.user.id} has 3 reserve`,
-      })
+      return res
+        .status(400)
+        .json({ success : false, message : `User ID ${req.user.id} has 3 reserve` })
     }
 
     const reserve = await Reserve.create(req.body)
 
-    res.status(200).json({ success: true, data: reserve })
+    return res
+      .status(200)
+      .json({ success: true, data: reserve })
+
   } catch (err) {
-    console.log(err)
-    res.status(400).json({ success: false })
+    // console.log(err)
+    return res
+      .status(500)
+      .json({ success: false })
   }
 }
 //@desc : Update a reserve
@@ -221,30 +228,35 @@ exports.createReserve = async (req, res, next) => {
 //@Access : Admin & Private (Me)
 exports.updateReserve = async (req,res,next) =>{
   try {
-      let reserve = await Reserve.findById(req.params.rid);
+      let reserve = await Reserve.findById(req.params.rid)
 
       if(!reserve) {
-          return res.status(404).json({success:false,message:`No reserve with the id of ${req.params.rid}`});
+          return res
+            .status(404)
+            .json({success:false,message:`No reserve with the id of ${req.params.rid}`})
       }
       
       //make sure user is the appointment owner
-      if(reserve.user.toString()!== req.user.id && req.user.role !== 'admin'){
-          return res.status(401).json({success:false,message:`Customer ${req.user.id} is not authorized to update this reserve`});
+      if(reserve.user.toString() !== req.user.id && req.user.role !== 'admin'){
+          return res
+            .status(401)
+            .json({success : false , message : `Customer ${req.user.id} is not authorized to update this reserve`})
       }
 
       reserve = await Reserve.findByIdAndUpdate(req.params.rid,req.body,{
           new:true,
           runValidators: true
-      });
+      })
       
-      res.status(200).json({
-          success:true,
-          data:reserve
-      });
+      return res
+        .status(200)
+        .json({ success : true, data : reserve })
 
   } catch(error){
-      console.log(error);
-      return res.status(500).json({success:false,message:"Cannot Update Reserve"});
+      // console.log(error)
+      return res
+        .status(500)
+        .json({success : false, message : "Cannot Update Reserve"})
   }
 };
 // @desc : Delete a reserve
@@ -253,23 +265,29 @@ exports.updateReserve = async (req,res,next) =>{
 exports.deleteReserve = async (req, res, next) => {
   try {
     const reserve = await Reserve.findById(req.params.rid)
+
     if (!reserve) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, massage: 'Cannot find this reserve' })
     }
 
     if (req.user.role !== 'admin' && reserve.user.toString() !== req.user.id) {
-      return res.status(401).json({
-        success: false,
-        massage: 'User is not authorized to delete this reserve',
-      })
+      return res
+        .status(401)
+        .json({ success: false, massage: 'User is not authorized to delete this reserve' })
     }
 
     await reserve.deleteOne()
-    res.status(200).json({ success: true, data: {} })
+
+    return res
+      .status(200)
+      .json({ success: true, data: {} })
+
   } catch (err) {
-    console.log(err)
-    res.status(500).json({ success: false })
+    // console.log(err)
+    return res
+      .status(500)
+      .json({ success: false })
   }
 }
