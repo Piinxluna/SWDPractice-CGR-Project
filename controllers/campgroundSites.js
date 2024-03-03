@@ -11,7 +11,7 @@ exports.getCampgroundSite = async (req, res, next) => {
     if (!site) {
       return res
         .status(404)
-        .json({ sucess : false, message : 'Cannot find this site' })
+        .json({ success: false, message: 'Cannot find this site' })
     }
 
     // Find a campground
@@ -23,22 +23,20 @@ exports.getCampgroundSite = async (req, res, next) => {
     if (!campground) {
       return res
         .status(404)
-        .json({ sucess: false, message: "Cannot find the site in this campground, maybe your campground's id or site's id is wrong" })
+        .json({
+          success: false,
+          message:
+            "Cannot find the site in this campground, maybe your campground's id or site's id is wrong",
+        })
     }
 
     // Send response
-    return res
-      .status(200)
-      .json({ sucess: true, campground, site })
-
+    return res.status(200).json({ success: true, campground, site })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }
-
 
 // @desc    Get all campground sites
 // @route   GET /api/campgrounds/:cgid/sites/
@@ -51,7 +49,7 @@ exports.getCampgroundSites = async (req, res, next) => {
     )
     if (!campground) {
       return res.status(400).json({
-        sucess: false,
+        success: false,
         message: 'Cannot find the campground',
       })
     }
@@ -60,7 +58,9 @@ exports.getCampgroundSites = async (req, res, next) => {
     const sites = await Site.find({ campground: req.params.cgid })
 
     // Send response
-    res.status(200).json({ sucess: true, campground, sites, count:sites.length })
+    res
+      .status(200)
+      .json({ success: true, campground, sites, count: sites.length })
   } catch (err) {
     console.log(err.stack)
     res.status(400).json({ success: false })
@@ -77,7 +77,7 @@ exports.createCampgroundSite = async (req, res, next) => {
     if (!zone || !number || !size) {
       return res
         .status(400)
-        .json({ sucess: false, message: "The new site's data is not valid" })
+        .json({ success: false, message: "The new site's data is not valid" })
     }
 
     // Check if there is no duplicated site
@@ -90,7 +90,7 @@ exports.createCampgroundSite = async (req, res, next) => {
     if (existedSite) {
       return res
         .status(400)
-        .json({ sucess: false, message: "The new site's data is duplicated" })
+        .json({ success: false, message: "The new site's data is duplicated" })
     }
 
     const site = await Site.create({
@@ -114,44 +114,49 @@ exports.createCampgroundSite = async (req, res, next) => {
       await Site.findByIdAndDelete(site.id)
       return res
         .status(404)
-        .json({ sucess : false, message : 'Cannot find this campground' })
+        .json({ success: false, message: 'Cannot find this campground' })
     }
 
     // Send response
-    return res
-      .status(201)
-      .json({ sucess : true, campground, newSite : site })
-      
+    return res.status(201).json({ success: true, campground, newSite: site })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 //@desc : Update a campground site in specific campground (cannot change campground id)
 //@route : PUT /api/campgrounds/:cgid/sites/:sid
 //@access : Admin
-exports.updateCampgroundSite = async (req,res,next) =>{
+exports.updateCampgroundSite = async (req, res, next) => {
   try {
-      const { zone, number, size } = req.body;
-      let campgroundSite  = await Site.findByIdAndUpdate(req.params.sid,{ zone, number, size },{
-          new:true,
-          runValidators: true
-      });
-      if(!campgroundSite) {
-        return res.status(404).json({success:false,message:`No campgroundSite with the id of ${req.params.sid}`});
+    const { zone, number, size } = req.body
+    let campgroundSite = await Site.findByIdAndUpdate(
+      req.params.sid,
+      { zone, number, size },
+      {
+        new: true,
+        runValidators: true,
       }
-      res.status(200).json({
-          success:true,
-          data:campgroundSite
-      });
-
-  } catch(error){
-      console.log(error);
-      return res.status(500).json({success:false,message:"Cannot Update CampgroundSite"});
+    )
+    if (!campgroundSite) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: `No campgroundSite with the id of ${req.params.sid}`,
+        })
+    }
+    res.status(200).json({
+      success: true,
+      data: campgroundSite,
+    })
+  } catch (error) {
+    console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Cannot Update CampgroundSite' })
   }
-};
+}
 
 // @desc    Delete a campground site in specific campground
 // @route   DEL /api/campgrounds/:cgid/sites/:sid
@@ -167,20 +172,15 @@ exports.deleteCampgroundSite = async (req, res, next) => {
     if (!site) {
       return res
         .status(404)
-        .json({ sucess: false, message: 'Cannot find this campground site' })
+        .json({ success: false, message: 'Cannot find this campground site' })
     }
 
     await site.deleteOne()
 
     // Send response
-    return res
-      .status(200)
-      .json({ sucess: true, data: {} })
-
+    return res.status(200).json({ success: true, data: {} })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }

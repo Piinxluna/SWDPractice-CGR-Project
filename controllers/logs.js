@@ -74,7 +74,7 @@ exports.getLogs = async (req, res, next) => {
       .json({ success: true, count: logs.length, pagination, data: logs })
   } catch (err) {
     // console.log(err.stack)
-    return res.status(500).json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -82,23 +82,19 @@ exports.getLogs = async (req, res, next) => {
 // @route : GET /api/logs/:lid
 // @access : Admin
 exports.getLog = async (req, res, next) => {
-  try{
+  try {
     const log = await Log.findById(req.params.lid)
 
     if (!log) {
       return res
         .status(404)
-        .json({ sucess: false, message: 'Not found log with this id' })
+        .json({ success: false, message: 'Not found log with this id' })
     }
-    
-    return res
-      .status(200)
-      .json({ success: true, data: log })
-  } catch(err) {
+
+    return res.status(200).json({ success: true, data: log })
+  } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -115,14 +111,9 @@ exports.deleteLog = async (req, res, next) => {
         .json({ success: false, message: 'Cannot find log' })
     }
 
-    return res
-      .status(200)
-      .json({ success: true, data: {} })
-
+    return res.status(200).json({ success: true, data: {} })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }

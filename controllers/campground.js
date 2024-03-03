@@ -74,51 +74,80 @@ exports.getCampgrounds = async (req, res, next) => {
     // Send response
     return res
       .status(200)
-      .json({ success : true, count : campgrounds.length, pagination, data : campgrounds })
-
+      .json({
+        success: true,
+        count: campgrounds.length,
+        pagination,
+        data: campgrounds,
+      })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 
 // @desc : Get a campground
 // @route : GET /api/campgrounds/:cgid
 // @access : Public
-exports.getCampground = async (req,res,next) =>{
-  try{
+exports.getCampground = async (req, res, next) => {
+  try {
     const campground = await Campground.findById(req.params.id)
 
-    if(!campground) {
-      return res.status(400).json({success:false})
+    if (!campground) {
+      return res.status(400).json({ success: false })
     }
-    
+
     return res.status(200).json({
-      success : true, 
-      data : campground
+      success: true,
+      data: campground,
     })
-  } catch(err){
-    return res.status(500).json({success:false})
+  } catch (err) {
+    return res.status(500).json({ success: false })
   }
 }
 
 // @desc : Create a new campground (without any sites and amount = 0)
 // @route : POST /api/campgrounds
 // @access : Admin
-exports.createCampground = async (req,res,next) =>{
-  try{
-
+exports.createCampground = async (req, res, next) => {
+  try {
     // Check if data is valid
-    const { name, tel, address, website, pictures, facilities, tentForRent, amount, sites} = req.body
-    const { houseNumber, lane, road, subDistrict, district, province, postalCode, link} = address
+    const {
+      name,
+      tel,
+      address,
+      website,
+      pictures,
+      facilities,
+      tentForRent,
+      amount,
+      sites,
+    } = req.body
+    const {
+      houseNumber,
+      lane,
+      road,
+      subDistrict,
+      district,
+      province,
+      postalCode,
+      link,
+    } = address
 
-    if(!name || !tel || !tentForRent || !houseNumber || !subDistrict || !district || !province || !postalCode){
+    if (
+      !name ||
+      !tel ||
+      !tentForRent ||
+      !houseNumber ||
+      !subDistrict ||
+      !district ||
+      !province ||
+      !postalCode
+    ) {
       // console.log(name + tel + tentForRent + houseNumber + subDistrict + district + province + postalCode);
       return res
         .status(400)
-        .json({ success : false, message : 'Please enter all required data'})
+        .json({ success: false, message: 'Please enter all required data' })
     }
 
     req.body.amount = 0
@@ -126,68 +155,53 @@ exports.createCampground = async (req,res,next) =>{
 
     const campground = await Campground.create(req.body)
 
-    return res
-      .status(201)
-      .json({ success : true, data : campground})
-
-  } catch(err){
-    console.log(err);
-    return res
-      .status(500)
-      .json({success:false})
+    return res.status(201).json({ success: true, data: campground })
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ success: false })
   }
 }
 
 // @desc : Update a campground
 // @route : PUT /api/campgrounds/:cgid
 // @access : Admin
-exports.updateCampground = async (req,res,next) => {
-  try{
-    // console.log(req.params.id,req.body); 
-    const campground = await Campground.findByIdAndUpdate(req.params.id , req.body, {
-      new : true,
-      runValidators : true
-    })
+exports.updateCampground = async (req, res, next) => {
+  try {
+    // console.log(req.params.id,req.body);
+    const campground = await Campground.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
 
-    if(!campground) {
-      return res
-        .status(404)
-        .json({success:false})
+    if (!campground) {
+      return res.status(404).json({ success: false })
     }
 
-    return res
-      .status(201)
-      .json({success : true, data : campground})
-
-  } catch(err) {
-    return res
-      .status(500)
-      .json({success:false})
+    return res.status(201).json({ success: true, data: campground })
+  } catch (err) {
+    return res.status(500).json({ success: false })
   }
 }
 
 // @desc : Delete a campground
 // @route : DEL /api/campgrounds/:cgid
 // @access : Admin
-exports.deleteCampground = async (req,res,next) =>{
-  try{
+exports.deleteCampground = async (req, res, next) => {
+  try {
     const campground = await Campground.findById(req.params.id)
 
-    if(!campground) {
-      return res
-        .status(404)
-        .json({success:false})
+    if (!campground) {
+      return res.status(404).json({ success: false })
     }
 
-    await campground.deleteOne();
+    await campground.deleteOne()
 
-    return res
-      .status(200)
-      .json({success:true, data:{}})
-
-  } catch(err) {
-    return res
-      .status(500)
-      .json({success:false})
+    return res.status(200).json({ success: true, data: {} })
+  } catch (err) {
+    return res.status(500).json({ success: false })
   }
 }

@@ -7,15 +7,10 @@ exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id)
 
-    return res
-      .status(200)
-      .json({ success: true, data: user })
-
+    return res.status(200).json({ success: true, data: user })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -29,18 +24,13 @@ exports.getUser = async (req, res, next) => {
     if (!user) {
       return res
         .status(404)
-        .json({ sucess: false, message: 'Not found user with this id' })
+        .json({ success: false, message: 'Not found user with this id' })
     }
 
-    return res
-      .status(200)
-      .json({ success: true, data: user })
-
+    return res.status(200).json({ success: true, data: user })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -116,12 +106,9 @@ exports.getUsers = async (req, res, next) => {
     return res
       .status(200)
       .json({ success: true, count: users.length, pagination, data: users })
-
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -136,7 +123,11 @@ exports.updateMe = async (req, res, next) => {
   if (!newData) {
     return res
       .status(400)
-      .json({ success: false, message: 'Please provide name, telephone number, email or password to update' })
+      .json({
+        success: false,
+        message:
+          'Please provide name, telephone number, email or password to update',
+      })
   }
 
   try {
@@ -151,15 +142,10 @@ exports.updateMe = async (req, res, next) => {
         .json({ success: false, message: 'Cannot find user' })
     }
 
-    return res
-      .status(200)
-      .json({ success: true, data: user })
-
+    return res.status(200).json({ success: true, data: user })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -167,7 +153,6 @@ exports.updateMe = async (req, res, next) => {
 // @route : PUT /api/users/:uid
 // @access : Admin
 exports.updateUser = async (req, res, next) => {
-
   const { name, tel, email, password } = req.body
 
   const newData = { name, tel, email, password }
@@ -175,7 +160,11 @@ exports.updateUser = async (req, res, next) => {
   if (!newData) {
     return res
       .status(400)
-      .json({ success: false, message: 'Please provide name, telephone number, email or password to update' })
+      .json({
+        success: false,
+        message:
+          'Please provide name, telephone number, email or password to update',
+      })
   }
 
   try {
@@ -190,15 +179,10 @@ exports.updateUser = async (req, res, next) => {
         .json({ success: false, message: 'Cannot find user' })
     }
 
-    return res
-      .status(200)
-      .json({ success: true, data: user })
-
+    return res.status(200).json({ success: true, data: user })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -212,7 +196,10 @@ exports.updateUserRole = async (req, res, next) => {
   if (!role || !validRoles.includes(role)) {
     return res
       .status(400)
-      .json({ success: false, message: 'Please provide a valid role to update' })
+      .json({
+        success: false,
+        message: 'Please provide a valid role to update',
+      })
   }
 
   try {
@@ -231,15 +218,10 @@ exports.updateUserRole = async (req, res, next) => {
         .json({ success: false, message: 'Cannot find user' })
     }
 
-    return res
-      .status(200)
-      .json({ success: true, data: user })
-
+    return res.status(200).json({ success: true, data: user })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(400)
-      .json({ success: false })
+    return res.status(400).json({ success: false })
   }
 }
 
@@ -258,15 +240,10 @@ exports.deleteMe = async (req, res, next) => {
 
     await user.deleteOne()
 
-    return res
-      .status(200)
-      .json({ success: true, data: {} })
-
+    return res.status(200).json({ success: true, data: {} })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -285,14 +262,9 @@ exports.deleteUser = async (req, res, next) => {
 
     await user.deleteOne()
 
-    return res
-      .status(200)
-      .json({ success: true, data: {} })
-
+    return res.status(200).json({ success: true, data: {} })
   } catch (err) {
     // console.log(err.stack)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }

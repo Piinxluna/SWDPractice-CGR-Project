@@ -21,7 +21,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   res
     .status(statusCode)
     .cookie('token', token, options)
-    .json({ sucess: true, token })
+    .json({ success: true, token })
 }
 
 // @desc    Create a new user (create and return token, save token in cookie)
@@ -45,13 +45,13 @@ exports.register = async (req, res, next) => {
     if (!log) {
       return res
         .status(400)
-        .json({ sucess: false, message: 'Cannot create log for this login' })
+        .json({ success: false, message: 'Cannot create log for this login' })
     }
 
     sendTokenResponse(user, 201, res)
   } catch (err) {
     console.log(err.stack)
-    res.status(400).json({ sucess: false })
+    res.status(400).json({ success: false })
   }
 }
 
@@ -65,7 +65,7 @@ exports.login = async (req, res, next) => {
   if (!email || !password) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Please provide email and password' })
+      .json({ success: false, message: 'Please provide email and password' })
   }
 
   const user = await User.findOne({ email }).select('+password')
@@ -74,7 +74,7 @@ exports.login = async (req, res, next) => {
   if (!user) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Invalid Credentials' })
+      .json({ success: false, message: 'Invalid credentials' })
   }
 
   //Check if password match
@@ -83,14 +83,14 @@ exports.login = async (req, res, next) => {
   if (!isMatch) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Invalid Credentials' })
+      .json({ success: false, message: 'Invalid credentials' })
   }
 
   const log = await Log.create({ user: user.id, action: 'login' })
   if (!log) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Cannot create log for this login' })
+      .json({ success: false, message: 'Cannot create log for this login' })
   }
 
   sendTokenResponse(user, 200, res)
@@ -112,7 +112,7 @@ exports.logout = async (req, res, next) => {
 
   if (!token || token == 'null') {
     return res.status(200).json({
-      sucess: true,
+      success: true,
       data: {},
     })
   }
@@ -126,7 +126,7 @@ exports.logout = async (req, res, next) => {
   if (!log) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Cannot create log for this logout' })
+      .json({ success: false, message: 'Cannot create log for this logout' })
   }
 
   // Delete token

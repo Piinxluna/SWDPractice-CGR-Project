@@ -150,7 +150,7 @@ exports.getReserves = async (req, res, next) => {
     })
   } catch (err) {
     // console.log(err.stack)
-    return res.status(500).json({ sucess: false })
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -159,12 +159,31 @@ exports.getReserves = async (req, res, next) => {
 // @access : Registered user
 exports.createReserve = async (req, res, next) => {
   try {
-    req.body.campground = req.params.cgid
-    req.body.site = req.params.sid
+    const { preferredName, startDate, tentSize, amount } = req.body
+    if (!startDate || !tentSize || !amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all the reserve's require data",
+      })
+    }
+    if (!preferredName) {
+      preferredName = await User.findById(req.user.id).select('name')
+    }
 
-    const campgroundSite = await Site.findOne({
-      _id: req.params.sid,
+    const data = {
       campground: req.params.cgid,
+      site: req.params.sid,
+      user: req.user.id,
+      preferredName,
+      startDate,
+      tentSize,
+      amount,
+    }
+
+    // Find campground site
+    const campgroundSite = await Site.findOne({
+      _id: data.site,
+      campground: data.campground,
     })
 
     if (!campgroundSite) {
@@ -173,6 +192,7 @@ exports.createReserve = async (req, res, next) => {
         .json({ success: false, message: 'Cannot find this site' })
     }
 
+    // Check tent's size
     if (
       campgroundSite.size.slength < req.body.tentSize.slength ||
       campgroundSite.size.swidth < req.body.tentSize.swidth
@@ -182,20 +202,26 @@ exports.createReserve = async (req, res, next) => {
         .json({ success: false, message: 'Your tent is too big' })
     }
 
-    //Add user id to req.body
-    req.body.user = req.user.id
-
+    // Check user's reserve
     const userExistedReserve = await Reserve.find({
-      user: req.user.id,
+      user: data.user,
       startDate: { $gte: Date.now() },
     })
-    const existedReserve = await Reserve.findOne({
-      campground: req.params.cgid,
-      site: req.params.sid,
-      startDate: req.body.startDate,
-    })
+
+    // Check if reserve more than 3
+    if (userExistedReserve.length >= 3 && req.user.role !== 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: 'User already has 3 reserve',
+      })
+    }
 
     // Check if this slot is avalible
+    const existedReserve = await Reserve.findOne({
+      campground: data.campground,
+      site: data.site,
+      startDate: data.startDate,
+    })
     if (existedReserve) {
       return res.status(400).json({
         success: false,
@@ -203,17 +229,9 @@ exports.createReserve = async (req, res, next) => {
       })
     }
 
-    // Check if reserve more than 3
-    if (userExistedReserve.length >= 3 && req.user.role !== 'admin') {
-      return res.status(400).json({
-        success: false,
-        message: `User ID ${req.user.id} has 3 reserve`,
-      })
-    }
+    const reserve = await Reserve.create(data)
 
-    const reserve = await Reserve.create(req.body)
-
-    return res.status(200).json({ success: true, data: reserve })
+    return res.status(201).json({ success: true, data: reserve })
   } catch (err) {
     // console.log(err)
     return res.status(500).json({ success: false })
@@ -373,6 +391,6 @@ exports.getBookedReserves = async (req, res, next) => {
     })
   } catch (err) {
     console.log(err.stack)
-    return res.status(400).json({ sucess: false })
+    return res.status(400).json({ success: false })
   }
 }
