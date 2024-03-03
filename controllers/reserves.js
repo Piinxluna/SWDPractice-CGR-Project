@@ -5,43 +5,42 @@ const Reserve = require('../models/Reserve')
 // @desc    Get a reserve
 // @route   GET /api/reserves/:rid
 // @access  Admin & Private (me)
-exports.getReserve = async (req,res,next) => {
+exports.getReserve = async (req, res, next) => {
   try {
-    const reserve = await Reserve.findById(req.params.rid).populate({
-      path: 'campground',
-      select: 'name tel address',
-    })
-    .populate({
-      path: 'user',
-      select: 'tel',
-    })
-    .populate({
-      path: 'site',
-      select: 'zone number size',
-    })
+    const reserve = await Reserve.findById(req.params.rid)
+      .populate({
+        path: 'campground',
+        select: 'name tel address',
+      })
+      .populate({
+        path: 'user',
+        select: 'tel',
+      })
+      .populate({
+        path: 'site',
+        select: 'zone number size',
+      })
 
-    if(!reserve) {
+    if (!reserve) {
       return res
         .status(404)
-        .json({success:false, message : 'Cannot find this reserve'})
+        .json({ success: false, message: 'Cannot find this reserve' })
     }
 
-    if(reserve.user.toString() !== req.user.id && req.user.role !== 'admin'){
-      return res
-        .status(401)
-        .json({success:false, message : 'Customer is not authorized to get this reserve'})
+    if (
+      reserve.user.id.toString() !== req.user.id &&
+      req.user.role !== 'admin'
+    ) {
+      return res.status(401).json({
+        success: false,
+        message: 'Customer is not authorized to get this reserve',
+      })
     }
 
-    return res
-      .status(200)
-      .json({ success : true, data : reserve})
-
-  }
-  catch (error){
+    return res.status(200).json({ success: true, data: reserve })
+  } catch (error) {
     // console.log(error);
-    return res
-      .status(500)
-      .json({success:false})
+    return res.status(500).json({ success: false })
   }
 }
 
@@ -164,8 +163,8 @@ exports.createReserve = async (req, res, next) => {
     req.body.site = req.params.sid
 
     const campgroundSite = await Site.findOne({
-      _id : req.params.sid,
-      campground : req.params.cgid
+      _id: req.params.sid,
+      campground: req.params.cgid,
     })
 
     if (!campgroundSite) {
@@ -180,7 +179,7 @@ exports.createReserve = async (req, res, next) => {
     ) {
       return res
         .status(400)
-        .json({ success : false, message : 'Your tent is too big' })
+        .json({ success: false, message: 'Your tent is too big' })
     }
 
     //Add user id to req.body
@@ -198,67 +197,63 @@ exports.createReserve = async (req, res, next) => {
 
     // Check if this slot is avalible
     if (existedReserve) {
-      return res
-        .status(400)
-        .json({ success : false, message : 'There are someone book this site at this time' })
+      return res.status(400).json({
+        success: false,
+        message: 'There are someone book this site at this time',
+      })
     }
 
     // Check if reserve more than 3
     if (userExistedReserve.length >= 3 && req.user.role !== 'admin') {
-      return res
-        .status(400)
-        .json({ success : false, message : `User ID ${req.user.id} has 3 reserve` })
+      return res.status(400).json({
+        success: false,
+        message: `User ID ${req.user.id} has 3 reserve`,
+      })
     }
 
     const reserve = await Reserve.create(req.body)
 
-    return res
-      .status(200)
-      .json({ success: true, data: reserve })
-
+    return res.status(200).json({ success: true, data: reserve })
   } catch (err) {
     // console.log(err)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }
 //@desc : Update a reserve
 //@route : PUT /api/reserves/:rid
 //@Access : Admin & Private (Me)
-exports.updateReserve = async (req,res,next) =>{
+exports.updateReserve = async (req, res, next) => {
   try {
-      let reserve = await Reserve.findById(req.params.rid)
+    let reserve = await Reserve.findById(req.params.rid)
 
-      if(!reserve) {
-          return res
-            .status(404)
-            .json({success:false,message:`No reserve with the id of ${req.params.rid}`})
-      }
-      
-      //make sure user is the appointment owner
-      if(reserve.user.toString() !== req.user.id && req.user.role !== 'admin'){
-          return res
-            .status(401)
-            .json({success : false , message : `Customer ${req.user.id} is not authorized to update this reserve`})
-      }
-
-      reserve = await Reserve.findByIdAndUpdate(req.params.rid,req.body,{
-          new:true,
-          runValidators: true
+    if (!reserve) {
+      return res.status(404).json({
+        success: false,
+        message: `No reserve with the id of ${req.params.rid}`,
       })
-      
-      return res
-        .status(200)
-        .json({ success : true, data : reserve })
+    }
 
-  } catch(error){
-      // console.log(error)
-      return res
-        .status(500)
-        .json({success : false, message : "Cannot Update Reserve"})
+    //make sure user is the appointment owner
+    if (reserve.user.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(401).json({
+        success: false,
+        message: `Customer ${req.user.id} is not authorized to update this reserve`,
+      })
+    }
+
+    reserve = await Reserve.findByIdAndUpdate(req.params.rid, req.body, {
+      new: true,
+      runValidators: true,
+    })
+
+    return res.status(200).json({ success: true, data: reserve })
+  } catch (error) {
+    // console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Cannot Update Reserve' })
   }
-};
+}
 // @desc : Delete a reserve
 // @route : DEL /api/reserves/:rid
 // @access : Admin & Private (Me)
@@ -273,29 +268,25 @@ exports.deleteReserve = async (req, res, next) => {
     }
 
     if (req.user.role !== 'admin' && reserve.user.toString() !== req.user.id) {
-      return res
-        .status(401)
-        .json({ success: false, massage: 'User is not authorized to delete this reserve' })
+      return res.status(401).json({
+        success: false,
+        massage: 'User is not authorized to delete this reserve',
+      })
     }
 
     await reserve.deleteOne()
 
-    return res
-      .status(200)
-      .json({ success: true, data: {} })
-
+    return res.status(200).json({ success: true, data: {} })
   } catch (err) {
     // console.log(err)
-    return res
-      .status(500)
-      .json({ success: false })
+    return res.status(500).json({ success: false })
   }
 }
 
 //@desc : Get booked reserve without user's detail (with filter, sort, select and pagination)
 //@route : GET /api/reserves/booked-reserves
 //@ฟccess : Public
-exports.getBookedReserves = async (req,res,next) => {
+exports.getBookedReserves = async (req, res, next) => {
   try {
     let query
 
@@ -318,8 +309,8 @@ exports.getBookedReserves = async (req,res,next) => {
 
     queryStr = JSON.parse(queryStr)
 
-
-    query = Reserve.find(queryStr).select('-user -id -tentSize -reservedAt -_id')
+    query = Reserve.find(queryStr)
+      .select('-user -id -tentSize -reservedAt -_id')
       .populate({
         path: 'campground',
         select: 'name tel address',
