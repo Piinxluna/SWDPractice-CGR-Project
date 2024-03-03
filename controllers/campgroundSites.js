@@ -39,6 +39,33 @@ exports.getCampgroundSite = async (req, res, next) => {
   }
 }
 
+
+// @desc    Get all campground sites
+// @route   GET /api/campgrounds/:cgid/sites/
+// @access  Public
+exports.getCampgroundSites = async (req, res, next) => {
+  try {
+    // Find a campground
+    const campground = await Campground.findById(req.params.cgid).select(
+      'name tel address'
+    )
+    if (!campground) {
+      return res.status(400).json({
+        sucess: false,
+        message: 'Cannot find the campground',
+      })
+    }
+
+    // Find sites
+    const sites = await Site.find({ campground: req.params.cgid })
+
+    // Send response
+    res.status(200).json({ sucess: true, campground, sites, count:sites.length })
+  } catch (err) {
+    console.log(err.stack)
+    res.status(400).json({ success: false })
+  }
+}
 // @desc    Create a new site for campground
 // @route   POST /api/campgrounds/:cgid/sites
 // @access  Admin
@@ -102,7 +129,29 @@ exports.createCampgroundSite = async (req, res, next) => {
       .json({ sucess: false })
   }
 }
+//@desc : Update a campground site in specific campground (cannot change campground id)
+//@route : PUT /api/campgrounds/:cgid/sites/:sid
+//@access : Admin
+exports.updateCampgroundSite = async (req,res,next) =>{
+  try {
+      const { zone, number, size } = req.body;
+      let campgroundSite  = await Site.findByIdAndUpdate(req.params.sid,{ zone, number, size },{
+          new:true,
+          runValidators: true
+      });
+      if(!campgroundSite) {
+        return res.status(404).json({success:false,message:`No campgroundSite with the id of ${req.params.sid}`});
+      }
+      res.status(200).json({
+          success:true,
+          data:campgroundSite
+      });
 
+  } catch(error){
+      console.log(error);
+      return res.status(500).json({success:false,message:"Cannot Update CampgroundSite"});
+  }
+};
 
 // @desc    Delete a campground site in specific campground
 // @route   DEL /api/campgrounds/:cgid/sites/:sid

@@ -1,8 +1,6 @@
 const express = require('express')
 const router = express.Router({ mergeParams: true })
 
-// Import middleware
-const { protect, authorize } = require('../middleware/auth')
 
 // Import controller
 const {
@@ -11,15 +9,21 @@ const {
   deleteReserve,
   getReserve,
   updateReserve,
+  getBookedReserves,
 } = require('../controllers/reserves')
+
+const { protect, authorize } = require('../middleware/auth')
 
 // Reserve router
 router.route('/')
-  .get(protect, getReserves)
-  .post(protect, createReserve)
+.get(protect, getReserves)
+.post(protect, createReserve)
+router.route('/booked-reserves')
+.get(getBookedReserves)
 router.route('/:rid')
-  .get(protect, getReserve)
-  .put(protect, updateReserve)
-  .delete(protect, deleteReserve)
+.delete(protect, deleteReserve)
+.get(protect , authorize('admin','customer') ,getReserve)
+.put(protect , authorize('admin','user'), updateReserve)
+
 
 module.exports = router
