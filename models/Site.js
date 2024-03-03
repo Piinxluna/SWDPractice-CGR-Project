@@ -27,6 +27,7 @@ const SiteSchema = new mongoose.Schema({
   },
 })
 
+// Delete site
 SiteSchema.pre(
   'deleteOne',
   { document: true, query: false },
@@ -41,7 +42,7 @@ SiteSchema.pre(
       },
       { runValidators: true }
     )
-    next
+    next()
   }
 )
 

@@ -21,7 +21,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   res
     .status(statusCode)
     .cookie('token', token, options)
-    .json({ sucess: true, token })
+    .json({ sucess : true, token })
 }
 
 // @desc    Create a new user (create and return token, save token in cookie)
@@ -31,7 +31,7 @@ exports.register = async (req, res, next) => {
   try {
     const { name, tel, email, password, role } = req.body
 
-    //Create user
+    // Create user
     const user = await User.create({
       name,
       tel,
@@ -40,17 +40,18 @@ exports.register = async (req, res, next) => {
       role,
     })
 
-    const log = await Log.create({ user: user.id, action: 'login' })
+    // Create Log
+    const log = await Log.create({ user: user.id, action: 'register' })
     if (!log) {
       return res
         .status(400)
-        .json({ sucess: false, message: 'Cannot create log for this login' })
+        .json({ sucess : false, message : 'Cannot create log for this login' })
     }
 
-    sendTokenResponse(user, 200, res)
+    sendTokenResponse(user, 201, res)
   } catch (err) {
-    res.status(400).json({ sucess: false })
-    console.log(err.stack)
+    res.status(400).json({ sucess : false })
+    // console.log(err.stack)
   }
 }
 
@@ -64,28 +65,28 @@ exports.login = async (req, res, next) => {
   if (!email || !password) {
     return res
       .status(400)
-      .json({ sucess: false, msg: 'Please provide email and password' })
+      .json({ sucess : false, message : 'Please provide email and password' })
   }
 
   const user = await User.findOne({ email }).select('+password')
 
   //Check if find the user or not
   if (!user) {
-    return res.status(400).json({ sucess: false, msg: 'Invalid Credentials' })
+    return res.status(400).json({ sucess : false, message : 'Invalid Credentials' })
   }
 
   //Check if password match
   const isMatch = await user.matchPassword(password)
 
   if (!isMatch) {
-    return res.status(400).json({ sucess: false, msg: 'Invalid Credentials' })
+    return res.status(400).json({ sucess : false, message : 'Invalid Credentials' })
   }
 
   const log = await Log.create({ user: user.id, action: 'login' })
   if (!log) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Cannot create log for this login' })
+      .json({ sucess : false, message : 'Cannot create log for this login' })
   }
 
   sendTokenResponse(user, 200, res)
@@ -121,7 +122,7 @@ exports.logout = async (req, res, next) => {
   if (!log) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Cannot create log for this login' })
+      .json({ sucess : false, message : 'Cannot create log for this logout' })
   }
 
   // Delete token
