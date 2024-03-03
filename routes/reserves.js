@@ -1,8 +1,6 @@
 const express = require('express')
 const router = express.Router({ mergeParams: true })
 
-// Import middleware
-const { protect, authorize } = require('../middleware/auth')
 
 // Import controller
 const {
@@ -26,4 +24,6 @@ router.route('/:rid')
 .delete(protect, deleteReserve)
 .get(protect , authorize('admin','customer') ,getReserve)
 .put(protect , authorize('admin','user'), updateReserve)
+
+
 module.exports = router
