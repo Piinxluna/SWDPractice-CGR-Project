@@ -100,7 +100,7 @@ exports.getCampgroundSite = async (req, res, next) => {
 exports.deleteCampgroundSite = async (req, res, next) => {
   try {
     // Check if there is a valid campground & sites
-    const site = await Site.findOneAndDelete({
+    const site = await Site.findOne({
       id: req.params.sid,
       campground: req.params.cgid,
     })
@@ -110,25 +110,10 @@ exports.deleteCampgroundSite = async (req, res, next) => {
         .json({ sucess: false, message: 'Cannot find this campground site' })
     }
 
-    const campground = await Campground.findByIdAndUpdate(
-      req.params.cgid,
-      {
-        $pull: { sites: site._id },
-        $inc: { amount: -1 },
-      },
-      { new: true, runValidators: true }
-    ).populate({
-      path: 'sites',
-    })
-    if (!campground) {
-      return res.status(400).json({
-        sucess: false,
-        message: "Cannot update campground's data",
-      })
-    }
+    await site.deleteOne()
 
     // Send response
-    res.status(200).json({ sucess: true, data: campground })
+    res.status(200).json({ sucess: true, data: {} })
   } catch (err) {
     console.log(err.stack)
     res.status(400).json({ sucess: false })

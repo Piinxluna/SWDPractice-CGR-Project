@@ -18,10 +18,7 @@ const CampgroundSchema = new mongoose.Schema({
       require: [true, 'Please add a house number'],
     },
     lane: String,
-    road: {
-      type: String,
-      require: [true, 'Please add a road'],
-    },
+    road: String,
     subDistrict: {
       type: String,
       require: [true, 'Please add a sub district'],
@@ -29,6 +26,10 @@ const CampgroundSchema = new mongoose.Schema({
     district: {
       type: String,
       require: [true, 'Please add a district'],
+    },
+    province: {
+      type: String,
+      require: [true, 'Please add a province'],
     },
     postalCode: {
       type: String,
@@ -56,5 +57,16 @@ const CampgroundSchema = new mongoose.Schema({
     },
   ],
 })
+
+CampgroundSchema.pre(
+  'deleteOne',
+  { document: true, query: false },
+  async function (next) {
+    console.log(this._id)
+    await this.model('Reserve').deleteMany({ campground: this._id })
+    await this.model('Site').deleteMany({ campground: this._id })
+    next
+  }
+)
 
 module.exports = mongoose.model('Campground', CampgroundSchema)
