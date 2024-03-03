@@ -1,10 +1,14 @@
 const express = require('express')
-const { register, login, logout } = require('../controllers/auth')
-
 const router = express.Router()
 
-const { protect } = require('../middleware/auth')
+// Import controller
+const { 
+  register, 
+  login, 
+  logout 
+} = require('../controllers/auth')
 
+// Auth router
 router.post('/register', register)
 router.post('/login', login)
 router.get('/logout', logout)
