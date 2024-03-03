@@ -2,6 +2,45 @@ const Campground = require('../models/Campground')
 const Site = require('../models/Site')
 const Reserve = require('../models/Reserve')
 
+// @desc    Get a reserve
+// @route   GET /api/reserves/:rid
+// @access  Admin & Private (me)
+exports.getReserve=async (req,res,next) => {
+  try {
+    
+      const reserve = await Reserve.findById(req.params.rid).populate({
+        path: 'campground',
+        select: 'name tel address',
+      })
+      .populate({
+        path: 'user',
+        select: 'tel',
+      })
+      .populate({
+        path: 'site',
+        select: 'zone number size',
+      })
+console.log(reserve);
+
+      if(!reserve) {
+          return res.status(404).json({success:false});
+      }
+
+      if(reserve.user.toString()!==req.user.id && req.user.role !== 'admin'){
+        return res.status(401).json({success:false, msg : "Customer is not authorized to get this reserve"});
+      }
+
+      res.status(200).json({
+          success:true,
+          data:reserve
+      });
+  }
+  catch (error){
+      console.log(error);
+      return res.status(500).json({success:false});
+  }
+}
+
 // @desc    Get all reserve (with filter, sort, select and pagination)
 // @route   GET /api/reserves
 // @access  Admin & Private (me)
@@ -177,7 +216,37 @@ exports.createReserve = async (req, res, next) => {
     res.status(400).json({ success: false })
   }
 }
+//@desc : Update a reserve
+//@route : PUT /api/reserves/:rid
+//@Access : Admin & Private (Me)
+exports.updateReserve = async (req,res,next) =>{
+  try {
+      let reserve = await Reserve.findById(req.params.rid);
 
+      if(!reserve) {
+          return res.status(404).json({success:false,message:`No reserve with the id of ${req.params.rid}`});
+      }
+      
+      //make sure user is the appointment owner
+      if(reserve.user.toString()!== req.user.id && req.user.role !== 'admin'){
+          return res.status(401).json({success:false,message:`Customer ${req.user.id} is not authorized to update this reserve`});
+      }
+
+      reserve = await Reserve.findByIdAndUpdate(req.params.rid,req.body,{
+          new:true,
+          runValidators: true
+      });
+      
+      res.status(200).json({
+          success:true,
+          data:reserve
+      });
+
+  } catch(error){
+      console.log(error);
+      return res.status(500).json({success:false,message:"Cannot Update Reserve"});
+  }
+};
 // @desc : Delete a reserve
 // @route : DEL /api/reserves/:rid
 // @access : Admin & Private (Me)
