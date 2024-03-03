@@ -58,6 +58,7 @@ const CampgroundSchema = new mongoose.Schema({
   ],
 })
 
+// Delete CAmpground
 CampgroundSchema.pre(
   'deleteOne',
   { document: true, query: false },
@@ -65,7 +66,7 @@ CampgroundSchema.pre(
     console.log(this._id)
     await this.model('Reserve').deleteMany({ campground: this._id })
     await this.model('Site').deleteMany({ campground: this._id })
-    next
+    next()
   }
 )
 
