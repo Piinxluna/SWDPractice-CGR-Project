@@ -109,6 +109,21 @@ exports.getCampground = async (req,res,next) =>{
 // @access : Admin
 exports.createCampground = async (req,res,next) =>{
   try{
+
+    // Check if data is valid
+    const { name, tel, address, website, pictures, facilities, tentForRent, amount, sites} = req.body
+    const { houseNumber, lane, road, subDistrict, district, province, postalCode, link} = address
+
+    if(!name || !tel || !tentForRent || !houseNumber || !subDistrict || !district || !province || !postalCode){
+      // console.log(name + tel + tentForRent + houseNumber + subDistrict + district + province + postalCode);
+      return res
+        .status(400)
+        .json({ success : false, message : 'Please enter all required data'})
+    }
+
+    req.body.amount = 0
+    req.body.sites = []
+
     const campground = await Campground.create(req.body)
 
     return res
@@ -116,6 +131,7 @@ exports.createCampground = async (req,res,next) =>{
       .json({ success : true, data : campground})
 
   } catch(err){
+    console.log(err);
     return res
       .status(500)
       .json({success:false})
