@@ -39,6 +39,33 @@ exports.getCampgroundSite = async (req, res, next) => {
   }
 }
 
+
+// @desc    Get all campground sites
+// @route   GET /api/campgrounds/:cgid/sites/
+// @access  Public
+exports.getCampgroundSites = async (req, res, next) => {
+  try {
+    // Find a campground
+    const campground = await Campground.findById(req.params.cgid).select(
+      'name tel address'
+    )
+    if (!campground) {
+      return res.status(400).json({
+        sucess: false,
+        message: 'Cannot find the campground',
+      })
+    }
+
+    // Find sites
+    const sites = await Site.find({ campground: req.params.cgid })
+
+    // Send response
+    res.status(200).json({ sucess: true, campground, sites, count:sites.length })
+  } catch (err) {
+    console.log(err.stack)
+    res.status(400).json({ success: false })
+  }
+}
 // @desc    Create a new site for campground
 // @route   POST /api/campgrounds/:cgid/sites
 // @access  Admin
