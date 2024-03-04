@@ -182,7 +182,7 @@ exports.updateCampground = async (req, res, next) => {
       return res.status(404).json({ success: false })
     }
 
-    return res.status(201).json({ success: true, data: campground })
+    return res.status(200).json({ success: true, data: campground })
   } catch (err) {
     return res.status(500).json({ success: false })
   }

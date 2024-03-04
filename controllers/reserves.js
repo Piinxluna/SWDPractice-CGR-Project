@@ -291,7 +291,7 @@ exports.deleteReserve = async (req, res, next) => {
     if (req.user.role !== 'admin' && reserve.user.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: 'User is not authorized to update this reserve',
+        message: 'User is not authorized to delete this reserve',
       })
     }
 
