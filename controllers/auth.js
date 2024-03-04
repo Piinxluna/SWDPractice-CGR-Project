@@ -21,7 +21,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   res
     .status(statusCode)
     .cookie('token', token, options)
-    .json({ sucess: true, token })
+    .json({ success: true, token })
 }
 
 // @desc    Create a new user (create and return token, save token in cookie)
@@ -31,7 +31,40 @@ exports.register = async (req, res, next) => {
   try {
     const { name, tel, email, password, role } = req.body
 
-    //Create user
+    if (!name || !tel || !email || !password || !role) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all the user's require data",
+      })
+    }
+
+    // Test validate
+    const testUserValidation = new User({
+      name,
+      tel,
+      email,
+      password,
+      role,
+    })
+    const error = testUserValidation.validateSync()
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: "The user's data is invalid" })
+    }
+
+    // Check if duplicate user or not
+    const checkDuplicateUser = await User.findOne({
+      $or: [{ email: email }, { tel: tel }],
+    })
+    if (checkDuplicateUser) {
+      return res.status(400).json({
+        success: false,
+        message: "The user's email or telephone number is duplicated",
+      })
+    }
+
+    // Create user
     const user = await User.create({
       name,
       tel,
@@ -40,6 +73,7 @@ exports.register = async (req, res, next) => {
       role,
     })
 
+    // Create Log
     const log = await Log.create({ user: user.id, action: 'login' })
     if (!log) {
       return res
@@ -47,10 +81,9 @@ exports.register = async (req, res, next) => {
         .json({ sucess: false, message: 'Cannot create log for this login' })
     }
 
-    sendTokenResponse(user, 200, res)
+    sendTokenResponse(user, 201, res)
   } catch (err) {
-    res.status(400).json({ sucess: false })
-    console.log(err.stack)
+    res.status(500).json({ success: false })
   }
 }
 
@@ -64,28 +97,32 @@ exports.login = async (req, res, next) => {
   if (!email || !password) {
     return res
       .status(400)
-      .json({ sucess: false, msg: 'Please provide email and password' })
+      .json({ success: false, message: 'Please provide email and password' })
   }
 
   const user = await User.findOne({ email }).select('+password')
 
   //Check if find the user or not
   if (!user) {
-    return res.status(400).json({ sucess: false, msg: 'Invalid Credentials' })
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid credentials' })
   }
 
   //Check if password match
   const isMatch = await user.matchPassword(password)
 
   if (!isMatch) {
-    return res.status(400).json({ sucess: false, msg: 'Invalid Credentials' })
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid credentials' })
   }
 
   const log = await Log.create({ user: user.id, action: 'login' })
   if (!log) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Cannot create log for this login' })
+      .json({ success: false, message: 'Cannot create log for this login' })
   }
 
   sendTokenResponse(user, 200, res)
@@ -107,7 +144,7 @@ exports.logout = async (req, res, next) => {
 
   if (!token || token == 'null') {
     return res.status(200).json({
-      sucess: true,
+      success: true,
       data: {},
     })
   }
@@ -121,7 +158,7 @@ exports.logout = async (req, res, next) => {
   if (!log) {
     return res
       .status(400)
-      .json({ sucess: false, message: 'Cannot create log for this login' })
+      .json({ success: false, message: 'Cannot create log for this logout' })
   }
 
   // Delete token

@@ -1,4 +1,10 @@
 const express = require('express')
+const router = express.Router()
+
+// Import middleware
+const { protect, authorize } = require('../middleware/auth')
+
+// Import controller
 const {
   getMe,
   getUser,
@@ -13,23 +19,21 @@ const {
 // Import others router
 const reservesRouter = require('./reserves')
 
-const router = express.Router()
-const { protect, authorize } = require('../middleware/auth')
+// Reserve router
+router.use('/:uid/reserves', reservesRouter)
 
-router.route('/').get(protect, authorize('admin'), getUsers)
-router
-  .route('/me')
+// User router
+router.route('/')
+  .get(protect, authorize('admin'), getUsers)
+router.route('/me')
   .get(protect, getMe)
   .put(protect, updateMe)
   .delete(protect, deleteMe)
-router
-  .route('/update-role/:uid')
+router.route('/update-role/:uid')
   .put(protect, authorize('admin'), updateUserRole)
-router
-  .route('/:uid')
+router.route('/:uid')
   .get(protect, authorize('admin'), getUser)
   .put(protect, authorize('admin'), updateUser)
   .delete(protect, authorize('admin'), deleteUser)
-router.use('/:uid/reserves', reservesRouter)
 
 module.exports = router

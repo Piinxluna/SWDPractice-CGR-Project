@@ -12,7 +12,10 @@ const UserSchema = new mongoose.Schema({
     minLength: 10,
     maxLength: 20,
     unique: true,
-    pattern: '^([0-9]{3}|[0-9]{2})-[0-9]{3}-[0-9]{4}$',
+    match: [
+      /^([0-9]{3}|[0-9]{2})-[0-9]{3}-[0-9]{4}$/, 
+      'Please add a valid tel'
+    ],
   },
   email: {
     type: String,
@@ -36,23 +39,24 @@ const UserSchema = new mongoose.Schema({
   },
 })
 
+// Delete user
 UserSchema.pre(
   'deleteOne',
   { document: true, query: false },
   async function (next) {
     await this.model('Reserve').deleteMany({ user: this._id })
     await this.model('Log').deleteMany({ user: this._id })
-    next
+    next()
   }
 )
 
-//Encrypt Password
+// Encrypt Password
 UserSchema.pre('save', async function (next) {
   const salt = await bcrypt.genSalt(10)
   this.password = await bcrypt.hash(this.password, salt)
 })
 
-//Sign JWT and return
+// Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign(
     { id: this._id }, // get only id from user
