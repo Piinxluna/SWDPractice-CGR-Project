@@ -168,6 +168,7 @@ exports.createCampground = async (req, res, next) => {
 
     req.body.amount = 0
     req.body.sites = []
+    req.body.pictures = []
 
     const campground = await Campground.create(req.body)
 
@@ -184,6 +185,9 @@ exports.createCampground = async (req, res, next) => {
 exports.updateCampground = async (req, res, next) => {
   try {
     // console.log(req.params.id,req.body);
+
+    delete req.body.pictures
+
     const campground = await Campground.findByIdAndUpdate(
       req.params.id,
       req.body,
