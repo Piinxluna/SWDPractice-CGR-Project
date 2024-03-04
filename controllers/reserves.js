@@ -285,13 +285,13 @@ exports.deleteReserve = async (req, res, next) => {
     if (!reserve) {
       return res
         .status(404)
-        .json({ success: false, massage: 'Cannot find this reserve' })
+        .json({ success: false, message: 'Cannot find this reserve' })
     }
 
     if (req.user.role !== 'admin' && reserve.user.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
-        massage: 'User is not authorized to update this reserve',
+        message: 'User is not authorized to update this reserve',
       })
     }
 
