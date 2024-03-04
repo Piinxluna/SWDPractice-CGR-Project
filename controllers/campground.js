@@ -6,11 +6,11 @@ const path = require('path')
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, 'campgroundImage')
+    cb(null, 'campgroundImage')
   },
   filename: (req, file, cb) => {
-      cb(null, 'campground-image' + '-' + Date.now() + '.png')
-  }
+    cb(null, 'campground-image' + '-' + Date.now() + '.png')
+  },
 })
 
 const upload = multer({ storage: storage })
@@ -185,8 +185,9 @@ exports.createCampground = async (req, res, next) => {
 exports.updateCampground = async (req, res, next) => {
   try {
     // console.log(req.params.id,req.body);
-
     delete req.body.pictures
+    delete req.body.sites
+    delete req.body.amount
 
     const campground = await Campground.findByIdAndUpdate(
       req.params.id,
@@ -227,7 +228,7 @@ exports.deleteCampground = async (req, res, next) => {
 }
 
 exports.uploadCampgroundImage = async (req, res, next) => {
-  try{
+  try {
     upload.single('file')(req, res, async function (err) {
       if (err) {
         console.error('File upload error:', err)
@@ -246,18 +247,21 @@ exports.uploadCampgroundImage = async (req, res, next) => {
       // Assuming req.file is available and contains the uploaded file information
       req.body.image = req.file.filename
 
-      const campground = await Campground.findByIdAndUpdate(req.params.cgid, {$addToSet : {pictures : req.body.image}},{new:true})
+      const campground = await Campground.findByIdAndUpdate(
+        req.params.cgid,
+        { $addToSet: { pictures: req.body.image } },
+        { new: true }
+      )
       if (!campground) {
         return res
           .status(500)
-          .json({ success: false, message: 'Cannot update campground\'s data' })
+          .json({ success: false, message: "Cannot update campground's data" })
       }
 
-
-      res.status(201).json({success : true, data : campground})
+      res.status(201).json({ success: true, data: campground })
     })
-  } catch(err) {
-    console.log(err);
-    return res.status(500).json({success : false})
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ success: false })
   }
-} 
+}
