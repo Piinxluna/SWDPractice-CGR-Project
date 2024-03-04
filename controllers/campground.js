@@ -84,55 +84,61 @@ exports.getCampgrounds = async (req, res, next) => {
     return res.status(400).json({ sucess: false })
   }
 }
-exports.createCampground = async (req,res,next) =>{
-  const campground = await Campground.create(req.body);
+exports.createCampground = async (req, res, next) => {
+  const campground = await Campground.create(req.body)
   return res.status(201).json({
-    success:true,
-    data : campground
-  });
-};
+    success: true,
+    data: campground,
+  })
+}
 
-exports.getCampground = async (req,res,next) =>{
-  try{
-    const campground = await Campground.findById(req.params.id);
-    if(!campground) {
-      return res.status(400).json({success:false});
+exports.getCampground = async (req, res, next) => {
+  try {
+    const campground = await Campground.findById(req.params.id).populate({
+      path: 'sites',
+      select: 'zone number size',
+    })
+    if (!campground) {
+      return res.status(400).json({ success: false })
     }
-    return res.status(200).json({success:true,data:campground});
-  } catch(err){
-    return res.status(400).json({success:false});
+    return res.status(200).json({ success: true, data: campground })
+  } catch (err) {
+    return res.status(400).json({ success: false })
   }
 }
 
-exports.updateCampground = async (req,res,next) => {
-  try{
-    console.log(req.params.id,req.body); 
-    const campground = await Campground.findByIdAndUpdate(req.params.id , req.body,{
-      new : true,
-      runValidators : true
-    });
-    if(!campground) {
-      return res.status(400).json({success:false});
+exports.updateCampground = async (req, res, next) => {
+  try {
+    console.log(req.params.id, req.body)
+    const campground = await Campground.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+    if (!campground) {
+      return res.status(400).json({ success: false })
     }
 
-    res.status(201).json({success:true ,data : campground});
-  }
-  catch(err) {
-    res.status(400).json({success:false});
+    res.status(201).json({ success: true, data: campground })
+  } catch (err) {
+    res.status(400).json({ success: false })
   }
 }
 
-exports.deleteCampground = async (req,res,next) =>{
-  try{
-    const campground = await Campground.findById(req.params.id);
+exports.deleteCampground = async (req, res, next) => {
+  try {
+    const campground = await Campground.findById(req.params.id)
 
-    if(!campground) {
-      return res.status(400).json({success:false});
+    if (!campground) {
+      return res.status(400).json({ success: false })
     }
 
-    await campground.deleteOne();
-    res.status(200).json({success:true, data:{}});
-  }catch(err){
-    res.status(400).json({success:false});
+    await campground.deleteOne()
+    res.status(200).json({ success: true, data: {} })
+  } catch (err) {
+    res.status(400).json({ success: false })
   }
 }
