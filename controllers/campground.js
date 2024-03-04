@@ -89,7 +89,10 @@ exports.getCampgrounds = async (req, res, next) => {
 // @access : Public
 exports.getCampground = async (req, res, next) => {
   try {
-    const campground = await Campground.findById(req.params.id)
+    const campground = await Campground.findById(req.params.id).populate({
+      path: 'sites',
+      select: 'zone number size',
+    })
 
     if (!campground) {
       return res.status(400).json({ success: false })
@@ -155,7 +158,7 @@ exports.createCampground = async (req, res, next) => {
 
     return res.status(201).json({ success: true, data: campground })
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     return res.status(500).json({ success: false })
   }
 }
