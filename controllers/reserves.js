@@ -33,7 +33,7 @@ exports.getReserve = async (req, res, next) => {
     ) {
       return res.status(403).json({
         success: false,
-        message: 'Customer is not authorized to get this reserve',
+        message: 'User is not authorized to get this reserve',
       })
     }
 
@@ -108,7 +108,7 @@ exports.getReserves = async (req, res, next) => {
       const sortBy = req.query.sort.split(',').join(' ')
       query = query.sort(sortBy)
     } else {
-      query = query.sort('-createdAt')
+      query = query.sort('-reservedAt')
     }
 
     // Pagination
@@ -258,7 +258,7 @@ exports.updateReserve = async (req, res, next) => {
     if (reserve.user.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: `Customer ${req.user.id} is not authorized to update this reserve`,
+        message: 'User is not authorized to update this reserve',
       })
     }
 
@@ -291,7 +291,7 @@ exports.deleteReserve = async (req, res, next) => {
     if (req.user.role !== 'admin' && reserve.user.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
-        massage: 'User is not authorized to delete this reserve',
+        massage: 'User is not authorized to update this reserve',
       })
     }
 
@@ -331,7 +331,7 @@ exports.getBookedReserves = async (req, res, next) => {
     queryStr = JSON.parse(queryStr)
 
     query = Reserve.find(queryStr)
-      .select('-user -id -tentSize -reservedAt -_id')
+      .select('campground site startDate')
       .populate({
         path: 'campground',
         select: 'name tel address',
@@ -341,18 +341,12 @@ exports.getBookedReserves = async (req, res, next) => {
         select: 'zone number size',
       })
 
-    // Select field
-    if (req.query.select) {
-      const fields = req.query.select.split(',').join(' ')
-      query = query.select(fields)
-    }
-
     // Sort field
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ')
       query = query.sort(sortBy)
     } else {
-      query = query.sort('-createdAt')
+      query = query.sort('startDate')
     }
 
     // Pagination

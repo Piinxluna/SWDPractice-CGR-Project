@@ -121,13 +121,11 @@ exports.updateMe = async (req, res, next) => {
   const newData = { name, tel, email, password }
 
   if (!newData) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message:
-          'Please provide name, telephone number, email or password to update',
-      })
+    return res.status(400).json({
+      success: false,
+      message:
+        'Please provide name, telephone number, email or password to update',
+    })
   }
 
   try {
@@ -158,13 +156,11 @@ exports.updateUser = async (req, res, next) => {
   const newData = { name, tel, email, password }
 
   if (!newData) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message:
-          'Please provide name, telephone number, email or password to update',
-      })
+    return res.status(400).json({
+      success: false,
+      message:
+        'Please provide name, telephone number, email or password to update',
+    })
   }
 
   try {
@@ -194,12 +190,10 @@ exports.updateUserRole = async (req, res, next) => {
   const validRoles = ['admin', 'customer']
 
   if (!role || !validRoles.includes(role)) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: 'Please provide a valid role to update',
-      })
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid role to update',
+    })
   }
 
   try {
