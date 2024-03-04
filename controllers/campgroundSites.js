@@ -127,8 +127,8 @@ exports.getCampgroundSites = async (req, res, next) => {
       .status(200)
       .json({ success: true, campground, sites, count: sites.length, pagination})
   } catch (err) {
-    console.log(err.stack)
-    res.status(400).json({ success: false })
+    // console.log(err.stack)
+    res.status(500).json({ success: false })
   }
 }
 // @desc    Create a new site for campground
