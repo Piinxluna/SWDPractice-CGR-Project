@@ -10,7 +10,8 @@ const {
   getCampground,
   createCampground , 
   updateCampground , 
-  deleteCampground 
+  deleteCampground, 
+  uploadCampgroundImage,
 } = require('../controllers/campground')
 
 // Import Campground controllers
@@ -37,6 +38,8 @@ router.route('/:id')
   .get(getCampground)
   .put(protect , authorize('admin') ,updateCampground)
   .delete(protect , authorize('admin') , deleteCampground)
+router.route('/:cgid/upload-image')
+  .post(protect, authorize('admin'), uploadCampgroundImage)
 router.route('/:cgid/sites')
   .get(getCampgroundSites)
   .post(protect , authorize('admin') ,createCampgroundSite)

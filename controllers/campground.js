@@ -1,5 +1,20 @@
 const Campground = require('../models/Campground')
 
+const multer = require('multer')
+const fs = require('fs')
+const path = require('path')
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, 'campgroundImage')
+  },
+  filename: (req, file, cb) => {
+      cb(null, 'campground-image' + '-' + Date.now() + '.png')
+  }
+})
+
+const upload = multer({ storage: storage })
+
 // @desc : Get all campgrounds (with filter, sort, select and pagination)
 // @route : GET /api/campgrounds
 // @access : Public
@@ -206,3 +221,39 @@ exports.deleteCampground = async (req, res, next) => {
     return res.status(500).json({ success: false })
   }
 }
+
+exports.uploadCampgroundImage = async (req, res, next) => {
+  try{
+    upload.single('file')(req, res, async function (err) {
+      if (err) {
+        console.error('File upload error:', err)
+        return res
+          .status(400)
+          .json({ success: false, message: 'Error uploading file' })
+      }
+
+      // Multer middleware has processed the file, and req.file is available here
+      if (!req.file) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'No file uploaded' })
+      }
+
+      // Assuming req.file is available and contains the uploaded file information
+      req.body.image = req.file.filename
+
+      const campground = await Campground.findByIdAndUpdate(req.params.cgid, {$addToSet : {pictures : req.body.image}},{new:true})
+      if (!campground) {
+        return res
+          .status(500)
+          .json({ success: false, message: 'Cannot update campground\'s data' })
+      }
+
+
+      res.status(201).json({success : true, data : campground})
+    })
+  } catch(err) {
+    console.log(err);
+    return res.status(500).json({success : false})
+  }
+} 
