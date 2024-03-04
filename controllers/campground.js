@@ -158,24 +158,11 @@ exports.createCampground = async (req, res, next) => {
 
     return res.status(201).json({ success: true, data: campground })
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     return res.status(500).json({ success: false })
   }
 }
 
-exports.updateCampground = async (req, res, next) => {
-  try {
-    console.log(req.params.id, req.body)
-    const campground = await Campground.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-    if (!campground) {
-      return res.status(400).json({ success: false })
 // @desc : Update a campground
 // @route : PUT /api/campgrounds/:cgid
 // @access : Admin
@@ -195,18 +182,12 @@ exports.updateCampground = async (req, res, next) => {
       return res.status(404).json({ success: false })
     }
 
-    res.status(201).json({ success: true, data: campground })
-  } catch (err) {
-    res.status(400).json({ success: false })
     return res.status(201).json({ success: true, data: campground })
   } catch (err) {
     return res.status(500).json({ success: false })
   }
 }
 
-exports.deleteCampground = async (req, res, next) => {
-  try {
-    const campground = await Campground.findById(req.params.id)
 // @desc : Delete a campground
 // @route : DEL /api/campgrounds/:cgid
 // @access : Admin
@@ -215,15 +196,9 @@ exports.deleteCampground = async (req, res, next) => {
     const campground = await Campground.findById(req.params.id)
 
     if (!campground) {
-      return res.status(400).json({ success: false })
-    if (!campground) {
       return res.status(404).json({ success: false })
     }
 
-    await campground.deleteOne()
-    res.status(200).json({ success: true, data: {} })
-  } catch (err) {
-    res.status(400).json({ success: false })
     await campground.deleteOne()
 
     return res.status(200).json({ success: true, data: {} })
@@ -231,4 +206,3 @@ exports.deleteCampground = async (req, res, next) => {
     return res.status(500).json({ success: false })
   }
 }
-
