@@ -44,13 +44,14 @@ const auth = require("./routes/auth");
 const users = require("./routes/users");
 const reserves = require("./routes/reserves");
 const logs = require("./routes/logs");
+const path = require("node:path");
 
 app.use("/api/campgrounds", campgrounds);
 app.use("/api/auth", auth);
 app.use("/api/users", users);
 app.use("/api/reserves", reserves);
 app.use("/api/logs", logs);
-app.use(express.static("campgroundImage"));
+app.use(express.static(path.join(__dirname, "campgroundImage")));
 
 // const test = require('./routes/test')
 // app.use('/test', test)
