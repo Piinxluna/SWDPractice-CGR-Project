@@ -52,7 +52,7 @@ app.use("/api/users", users);
 app.use("/api/reserves", reserves);
 app.use("/api/logs", logs);
 
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(__dirname));
 
 // const test = require('./routes/test')
 // app.use('/test', test)
