@@ -51,7 +51,8 @@ app.use("/api/auth", auth);
 app.use("/api/users", users);
 app.use("/api/reserves", reserves);
 app.use("/api/logs", logs);
-app.use(express.static("public"));
+
+app.use(express.static(path.join(__dirname)));
 
 // const test = require('./routes/test')
 // app.use('/test', test)
