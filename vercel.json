@@ -5,9 +5,17 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "campgroundImage/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/images/(.+)",
+      "dest": "campgroundImage/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "server.js"
