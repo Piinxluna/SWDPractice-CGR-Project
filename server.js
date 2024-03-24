@@ -3,7 +3,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
-const fs = require("node:fs");
+const path = require("path");
 
 //Security
 const mongoSanitize = require("express-mongo-sanitize");
@@ -38,21 +38,21 @@ app.use(limiter);
 app.use(hpp());
 app.use(cors());
 
+// Serve static files from the campgroundImage directory
+app.use("/images", express.static(path.join(__dirname, "campgroundImage")));
+
 // Routing
 const campgrounds = require("./routes/campgrounds");
 const auth = require("./routes/auth");
 const users = require("./routes/users");
 const reserves = require("./routes/reserves");
 const logs = require("./routes/logs");
-const path = require("node:path");
 
 app.use("/api/campgrounds", campgrounds);
 app.use("/api/auth", auth);
 app.use("/api/users", users);
 app.use("/api/reserves", reserves);
 app.use("/api/logs", logs);
-
-app.use("/images", express.static(path.join(__dirname, "campgroundImage")));
 
 // const test = require('./routes/test')
 // app.use('/test', test)
