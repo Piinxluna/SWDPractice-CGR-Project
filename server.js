@@ -50,7 +50,7 @@ app.use("/api/auth", auth);
 app.use("/api/users", users);
 app.use("/api/reserves", reserves);
 app.use("/api/logs", logs);
-app.use("/image", express.static("campgroundImage"));
+app.use(express.static("campgroundImage"));
 
 // const test = require('./routes/test')
 // app.use('/test', test)
