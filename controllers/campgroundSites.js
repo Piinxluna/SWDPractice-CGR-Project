@@ -21,13 +21,11 @@ exports.getCampgroundSite = async (req, res, next) => {
     }).select('-sites')
 
     if (!campground) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message:
-            "Cannot find the site in this campground, maybe your campground's id or site's id is wrong",
-        })
+      return res.status(404).json({
+        success: false,
+        message:
+          "Cannot find the site in this campground, maybe your campground's id or site's id is wrong",
+      })
     }
 
     // Send response
@@ -123,9 +121,13 @@ exports.getCampgroundSites = async (req, res, next) => {
     }
 
     // Send response
-    res
-      .status(200)
-      .json({ success: true, campground, sites, count: sites.length, pagination})
+    res.status(200).json({
+      success: true,
+      campground,
+      sites,
+      count: sites.length,
+      pagination,
+    })
   } catch (err) {
     // console.log(err.stack)
     res.status(500).json({ success: false })
@@ -204,12 +206,10 @@ exports.updateCampgroundSite = async (req, res, next) => {
       }
     )
     if (!campgroundSite) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: `No campgroundSite with the id of ${req.params.sid}`,
-        })
+      return res.status(404).json({
+        success: false,
+        message: `No campgroundSite with the id of ${req.params.sid}`,
+      })
     }
     res.status(200).json({
       success: true,
@@ -229,10 +229,7 @@ exports.updateCampgroundSite = async (req, res, next) => {
 exports.deleteCampgroundSite = async (req, res, next) => {
   try {
     // Check if there is a valid campground & sites
-    const site = await Site.findOne({
-      id: req.params.sid,
-      campground: req.params.cgid,
-    })
+    const site = await Site.findById(req.params.sid)
 
     if (!site) {
       return res
