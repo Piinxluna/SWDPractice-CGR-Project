@@ -20,7 +20,7 @@ exports.getLogs = async (req, res, next) => {
 
     //Create operator $gt $gte
     queryStr = queryStr.replace(
-      /\b(gt|get|lt|lte|in)\b/g,
+      /\b(gt|gte|lt|lte|in)\b/g,
       (match) => `$${match}`
     )
     query = Log.find(JSON.parse(queryStr))
